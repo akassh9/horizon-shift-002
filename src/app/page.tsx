@@ -210,10 +210,11 @@ const windows: WindowConfig[] = [
 ];
 
 // Renderer component for each window
-function MotionWindow({ cfg }: { cfg: WindowConfig }) {
+function MotionWindow({ cfg, bringToFront }: { cfg: WindowConfig; bringToFront: (id: string) => void }) {
   return (
     <motion.div
       key={cfg.key}
+      onPointerDown={() => bringToFront(cfg.key)}
       style={{ }}
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
@@ -360,7 +361,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
   };
 
   // Bring-to-front logic for windows (placeholder for real logic)
-  const bringToFront = (id: string) => {
+  const bringToFront = () => {
     const newZ = zCounter + 1;
     setZCounter(newZ);
     // (You would set the z-index for the window with id here)
@@ -368,9 +369,11 @@ To load a category, hover over the File menu, select Add, then choose your desir
 
   useEffect(() => {
     if (showHelp) {
-      const newZ = zCounter + 1;
-      setZCounter(newZ);
-      setHelpZIndex(newZ);
+      setZCounter(prev => {
+        const newZ = prev + 1;
+        setHelpZIndex(newZ);
+        return newZ;
+      });
     }
   }, [showHelp]);
 
@@ -479,7 +482,9 @@ To load a category, hover over the File menu, select Add, then choose your desir
       )}
 
       <AnimatePresence>
-        {showWindows && windows.map(cfg => <MotionWindow key={cfg.key} cfg={cfg} />)}
+        {showWindows && windows.map(cfg => (
+          <MotionWindow key={cfg.key} cfg={cfg} bringToFront={bringToFront} />
+        ))}
       </AnimatePresence>
 
       <button onClick={() => setShowWindows(true)}>Show Windows (Debug)</button>
