@@ -1,4 +1,3 @@
-// components/TextEditWindow.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { DraggableWindow } from "./DraggableWindow";
@@ -6,7 +5,7 @@ import { DraggableWindow } from "./DraggableWindow";
 const introText = `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 BOOT>> 14 May 2040  09:17:33 EST
 ————————
-Hi, explorer.  Welcome to the public mirror of the **Dr. Me Foresight Archive**.  
+Hi, explorer.  Welcome to the public mirror of the <strong>Dr. Me Foresight Archive</strong>.  
 Health is no longer a service; it is the firmware of society.
 
 ↓  AVAILABLE FILES  ↓`;
@@ -120,9 +119,10 @@ export const TextEditWindow: React.FC<{
           ref={containerRef}
           className="relative w-full h-[calc(100%-1.75rem)] p-4 overflow-y-auto font-mono text-base"
         >
-          <div className="whitespace-pre-wrap">
-            {displayedText}
-          </div>
+          <div
+            className="whitespace-pre-wrap"
+            dangerouslySetInnerHTML={{ __html: displayedText }}
+          />
           {showOptions && (
             <div className="mt-4">
               {options.map((opt, idx) => (

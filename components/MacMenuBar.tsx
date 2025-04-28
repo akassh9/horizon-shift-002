@@ -4,9 +4,12 @@ import React, { useState, useRef } from "react";
 
 type MacMenuBarProps = {
   onAddHealth?: () => void;
+  onHelp?: () => void;
+  disableFile?: boolean;
+  disableHelp?: boolean;
 };
 
-export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth }) => {
+export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, disableFile, disableHelp }) => {
   const [fileOpen, setFileOpen] = useState(false);
   const fileRef = useRef<HTMLSpanElement>(null);
 
@@ -46,11 +49,11 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth }) => {
             <span
               key={item}
               ref={fileRef}
-              className={`hover:bg-gray-200 px-2 py-1 rounded cursor-pointer relative ${fileOpen ? "bg-gray-200" : ""}`}
-              onClick={() => setFileOpen((open) => !open)}
+              className={`px-2 py-1 rounded relative ${fileOpen ? "bg-gray-200" : ""} ${disableFile ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 cursor-pointer"}`}
+              onClick={() => { if (!disableFile) setFileOpen(open => !open); }}
             >
               {item}
-              {fileOpen && (
+              {fileOpen && !disableFile && (
                 <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-30">
                   <div className="relative group">
                     <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer flex justify-between items-center">
@@ -72,11 +75,22 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth }) => {
                       <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer">Entertainment</div>
                     </div>
                   </div>
-                  <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer" onClick={() => window.location.reload()}>
+                  <div
+                    className={`px-4 py-1 ${disableFile ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 cursor-pointer"}`}
+                    onClick={() => { if (!disableFile) window.location.reload(); }}
+                  >
                     Reset
                   </div>
                 </div>
               )}
+            </span>
+          ) : item === "Help" ? (
+            <span
+              key={item}
+              className={`px-2 py-1 rounded ${disableHelp ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 cursor-pointer"}`}
+              onClick={() => { if (!disableHelp) onHelp?.(); }}
+            >
+              {item}
             </span>
           ) : (
             <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
