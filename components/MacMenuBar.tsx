@@ -1,6 +1,7 @@
 // components/MacMenuBar.tsx
 "use client";
 import React, { useState, useRef } from "react";
+import Link from "next/link";
 
 type MacMenuBarProps = {
   onAddHealth?: () => void;
@@ -44,7 +45,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, dis
     >
       <span className="mr-6 text-lg"></span>
       <nav className="flex space-x-6 text-base font-medium relative">
-        {["Text Editor", "File", "Edit", "Format", "View", "Window", "Help"].map((item) =>
+        {["Terminal 13.2", "File", "Edit", "Format", "View", "History", "Help"].map((item) =>
           item === "File" ? (
             <span
               key={item}
@@ -92,6 +93,16 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, dis
             >
               {item}
             </span>
+          ) : item === "History" ? (
+            <Link
+              key={item}
+              href="/history"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
+            >
+              {item}
+            </Link>
           ) : (
             <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
               {item}

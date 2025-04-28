@@ -145,8 +145,15 @@ const windows: WindowConfig[] = [
     src: "/images/Generated_Image_March_14__2025_-_8_05PM.png-removebg-preview.png",
   },
   {
+    key: "celebrity",
+    pos: { x: 816, y: 901 },
+    size: { width: 250, height: 250 },
+    type: "image",
+    src: "/images/ChatGPT Image Apr 26, 2025, 06_10_44 AM.png",
+  },
+  {
     key: "text11",
-    pos: { x: 758, y: 1033 },
+    pos: { x: 971, y: 851 },
     size: { width: "auto", height: "auto" },
     type: "text",
     text: "Celebrity Health Hobbies",
@@ -210,7 +217,15 @@ const windows: WindowConfig[] = [
 ];
 
 // Renderer component for each window
-function MotionWindow({ cfg, bringToFront }: { cfg: WindowConfig; bringToFront: (id: string) => void }) {
+function MotionWindow({
+  cfg,
+  bringToFront,
+  highlighted = false,
+}: {
+  cfg: WindowConfig;
+  bringToFront: (id: string) => void;
+  highlighted?: boolean;
+}) {
   return (
     <motion.div
       key={cfg.key}
@@ -226,11 +241,11 @@ function MotionWindow({ cfg, bringToFront }: { cfg: WindowConfig; bringToFront: 
         initialPos={cfg.pos}
         width={cfg.size.width}
         height={cfg.size.height}
-        className={
+        className={`${
           cfg.type === "text"
             ? "bg-white shadow-sm"
             : "bg-transparent shadow-none border-none"
-        }
+        } ${highlighted ? "ring-4 ring-blue-400" : ""}`}
       >
         {cfg.type === "image" && cfg.src ? (
           <Image
@@ -255,6 +270,7 @@ function MotionWindow({ cfg, bringToFront }: { cfg: WindowConfig; bringToFront: 
 export default function Home() {
   const [showHelp, setShowHelp] = useState(true);
   const [showWindows, setShowWindows] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number>(-1);
   const [helpAnswer, setHelpAnswer] = useState("");
   const [centerPos, setCenterPos] = useState({ x: 694, y: 299 });
   // Z-index for help window
@@ -280,16 +296,12 @@ export default function Home() {
   // Help intro typing effect
   const helpIntroText = `This resource has been developed by SIN Consulting Ltd. to help you adjust to everyday life in the year 2034.
 
-In 2028, as part of Employee Upskilling Initiative (#877956), you underwent Brain-Computer Interface (BCI) integration surgery.
-Unfortunately, unforeseen complications arose during the procedure, requiring your placement into an Extended Aging Freeze™ pod.
+In 2028, as part of Employee Upskilling Initiative (#1967), you underwent Brain-Computer Interface (BCI) integration surgery. Unfortunately, unforeseen complications arose during the procedure, requiring your placement into an Extended Aging Freeze™ pod.
 
-Your employer has generously extended credit coverage for your pod usage and granted you access to this resource,
-enabling you to catch up with developments and societal changes since your surgery.
+Your employer has generously extended credit coverage for your pod usage and granted you access to this resource, enabling you to catch up with developments and societal changes since your surgery.
 
 Important Disclaimer:
-By proceeding to use this website, you agree to waive any rights to participate in the ongoing class-action lawsuit
-against Employer #2314 regarding alleged negligence, withholding of critical information, or related claims associated
-with the Employee Upskilling Initiative.
+By proceeding to use this website, you agree to waive any rights to participate in the ongoing class-action lawsuit against Employer #451 regarding alleged negligence, withholding of critical information, or related claims associated with the Employee Upskilling Initiative.
 
 Type yes to confirm and continue.`;
   const [helpDisplayedText, setHelpDisplayedText] = useState("");
@@ -376,6 +388,24 @@ To load a category, hover over the File menu, select Add, then choose your desir
       });
     }
   }, [showHelp]);
+
+  // Option highlight mapping and selected
+  const optionHighlights: Record<number, string[]> = {
+    0: ['text1','text3','text5','text4'],
+    1: ['text6','text7','text8','text9', 'text10'],
+    2: ['text11','humanoid-text','techlimbs-text','body-computer-text','aging-text'],
+  };
+  const highlightedKeys = optionHighlights[selectedOption] || [];
+
+  // Map option index to window keys to show
+  const optionWindows: Record<number, string[]> = {
+    0: ['techanswers', 'sensors', 'surgery', 'text1', 'text3', 'text4', 'text5', 'info'],
+    1: ['text6','text7','text8','text9', 'text10','pip','grocery','law','overreach','money'],
+    2: ['text11','humanoid-text','techlimbs-text','body-computer-text','aging-text','celebrity','humanoid-img','techlimbs-img','body-computer-img','aging-img'],
+  };
+  const windowsToRender = selectedOption in optionWindows
+    ? windows.filter(w => optionWindows[selectedOption].includes(w.key))
+    : windows;
 
   return (
     <>
@@ -478,12 +508,21 @@ To load a category, hover over the File menu, select Add, then choose your desir
       </AnimatePresence>
 
       {showWindows && (
-        <TextEditWindow initialPos={{ x: 694, y: 299 }} initialZIndex={1} />
+        <TextEditWindow
+          initialPos={{ x: 694, y: 299 }}
+          initialZIndex={1}
+          onOptionSelect={setSelectedOption}
+        />
       )}
 
       <AnimatePresence>
-        {showWindows && windows.map(cfg => (
-          <MotionWindow key={cfg.key} cfg={cfg} bringToFront={bringToFront} />
+        {showWindows && windowsToRender.map(cfg => (
+          <MotionWindow
+            key={cfg.key}
+            cfg={cfg}
+            bringToFront={bringToFront}
+            highlighted={highlightedKeys.includes(cfg.key)}
+          />
         ))}
       </AnimatePresence>
 
