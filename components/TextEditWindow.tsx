@@ -151,7 +151,7 @@ export const TextEditWindow: React.FC<{
       id="text-editor"
       initialPos={initialPos}
       width={800}
-      height={500}
+      height={520}
       initialZIndex={initialZIndex}
       className="mac-window bg-white text-black font-mono border border-gray-300 shadow-lg"
     >
