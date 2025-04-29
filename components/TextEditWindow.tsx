@@ -4,7 +4,7 @@ import { DraggableWindow } from "./DraggableWindow";
 
 const introText = `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
 CATEGORY LOADED: Health
-Date Retrieved: 14 May 2040 | 09:17:33 EST
+Date Retrieved: 2 April 2038 | 09:17:33 EST
 ————————
 You may choose one of the following three health scenarios to explore further. Each scenario focuses on key developments reshaping healthcare in 2034. 
 
@@ -179,7 +179,7 @@ Use the arrow keys (↑ / ↓) to navigate, click any headline to open the origi
     const fileName = options[selected].file;
     return `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
 └─ QUERY: "${fileName}"
-Date Retrieved: 14 May 2040 | 09:17:33 EST`;
+Date Retrieved: 2 April 2038 | 09:17:33 EST`;
   }, [selected]);
 
   // Notify parent of the newly selected option (after options are visible)

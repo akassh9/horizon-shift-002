@@ -839,7 +839,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 {/* Title */}
                 <h1 className="ml-3 text-lg font-semibold">Welcome User</h1>
                 {/* Timestamp */}
-                <span className="ml-auto text-sm text-gray-500">April 28, 2025 at 8:24 PM</span>
+                <span className="ml-auto text-sm text-gray-500">April 2, 2034 at 8:24 PM</span>
               </div>
               {helpAnswer.trim().toLowerCase() === "yes" ? (
                 <div className="px-4 py-3 font-mono whitespace-pre-wrap">
