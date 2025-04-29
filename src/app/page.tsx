@@ -214,7 +214,107 @@ const windows: WindowConfig[] = [
     type: "text",
     text: "Anti Aging Race.",
   },
+  // ✨  NEW  — example wearable images  ✨
+  {
+    key: "wearable1",          // unique key
+    pos: { x: 120, y: 953 },        // where it spawns
+    size: { width: 700, height: 115.94 },
+    type: "image",
+    src: "/images/wearable1.png",
+  },
+  {
+    key: "wearable2",
+    pos: { x: 256, y: 161 },
+    size: { width: 700, height: 108.41 },
+    type: "image",
+    src: "/images/wearable2.png",
+  },
+  {
+    key: "wearable3",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 157.5 },
+    type: "image",
+    src: "/images/wearable3.png",
+  },
+  {
+    key: "healthassist1",          // unique key
+    pos: { x: 83, y: 683 },        // where it spawns
+    size: { width: 500, height: 291.2 },
+    type: "image",
+    src: "/images/healthassist1.png",
+  },
+  {
+    key: "healthassist2",
+    pos: { x: 106, y: 150 },
+    size: { width: 400, height: 295.65 },
+    type: "image",
+    src: "/images/healthassist2.png",
+  },
+  {
+    key: "healthassist3",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 157.5 },
+    type: "image",
+    src: "/images/healthassist3.png",
+  },
+  {
+    key: "marketplace1",          // unique key
+    pos: { x: 83, y: 683 },        // where it spawns
+    size: { width: 550, height: 102.67 },
+    type: "image",
+    src: "/images/marketplace1.png",
+  },
+  {
+    key: "marketplace2",
+    pos: { x: 1053, y: 192 },
+    size: { width: 700, height: 59.65 },
+    type: "image",
+    src: "/images/marketplace2.png",
+  },
+  {
+    key: "marketplace3",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 76 },
+    type: "image",
+    src: "/images/marketplace3.png",
+  },
+  {
+    key: "hollistic1",          // unique key
+    pos: { x: 1550, y: 801 },        // where it spawns
+    size: { width: 550, height: 75.77 },
+    type: "image",
+    src: "/images/hollistic1.png",
+  },
+  {
+    key: "hollistic2",
+    pos: { x: 907, y: 915 },
+    size: { width: 700, height: 203.57 },
+    type: "image",
+    src: "/images/hollistic2.png",
+  },
+  {
+    key: "hollistic3",
+    pos: { x: 23, y: 101 },
+    size: { width: 600, height: 366 },
+    type: "image",
+    src: "/images/hollistic3.png",
+  },
 ];
+// --- hyperlinks for special draggables ---
+const linkMap: Record<string, string> = {
+  wearable1: "https://www.tandfonline.com/doi/full/10.1080/08164622.2025.2492761?utm_source=chatgpt.com",
+  wearable2: "https://time.com/6304107/full-body-mri-health-scan/?utm_source=chatgpt.com",
+  wearable3: "https://www.gssiweb.org/sports-science-exchange/article/gx-sweat-patch-and-app-for-personalized-hydration",
+  healthassist1: "https://nextdigitalhealth.com/healthcaretechnology/connected-health/symptomate-review-2024-check-your-symptoms-online/?utm_source=chatgpt.com",
+  healthassist2: "https://www.tctmd.com/news/fda-clears-ai-ecg-screening-tools-cv-care-whats-next-grabs?utm_source=chatgpt.com",
+  healthassist3: "https://www.washingtonpost.com/opinions/2025/04/22/ai-health-care-expert-opinions/?utm_source=chatgpt.com",
+  marketplace1: "https://blockchainhealthcaretoday.com/index.php/journal/article/view/338?utm_source=chatgpt.com",
+  marketplace3: "https://kms-healthcare.com/blog/data-monetization-in-healthcare/?utm_source=chatgpt.com",
+  marketplace2: "https://time.com/7271463/23andme-data-ai-bankruptcy/?utm_source=chatgpt.com",
+  hollistic1: "https://www.fairhealth.org/article/getting-covered-for-alternative-medicine-2023?utm_source=chatgpt.com",
+  hollistic2: "https://www.verywellhealth.com/fda-panel-rejects-mdma-therapy-for-ptsd-8659953?utm_source=chatgpt.com",
+  hollistic3: "https://www.medicare.gov/coverage/acupuncture?utm_source=chatgpt.com",
+};
 
 // Renderer component for each window
 function MotionWindow({
@@ -247,7 +347,8 @@ function MotionWindow({
             : "bg-transparent shadow-none border-none"
         } ${highlighted ? "ring-4 ring-blue-400" : ""}`}
       >
-        {cfg.type === "image" && cfg.src ? (
+{(() => {
+        const inner = cfg.type === "image" && cfg.src ? (
           <Image
             src={cfg.src}
             alt={cfg.key}
@@ -261,7 +362,22 @@ function MotionWindow({
               {cfg.text}
             </p>
           </div>
-        )}
+        );
+
+        const href = linkMap[cfg.key];
+        return href ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full h-full"
+          >
+            {inner}
+          </a>
+        ) : (
+          inner
+        );
+      })()}
       </DraggableWindow>
     </motion.div>
   );
@@ -271,6 +387,8 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(true);
   const [showWindows, setShowWindows] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number>(-1);
+  const [happenedMode, setHappenedMode] = useState(false);
+  const [hoveredHappened, setHoveredHappened] = useState<number | null>(null);
   const [helpAnswer, setHelpAnswer] = useState("");
   const [centerPos, setCenterPos] = useState({ x: 694, y: 299 });
   // Z-index for help window
@@ -403,9 +521,30 @@ To load a category, hover over the File menu, select Add, then choose your desir
     1: ['text6','text7','text8','text9', 'text10','pip','grocery','law','overreach','money'],
     2: ['text11','humanoid-text','techlimbs-text','body-computer-text','aging-text','celebrity','humanoid-img','techlimbs-img','body-computer-img','aging-img'],
   };
-  const windowsToRender = selectedOption in optionWindows
-    ? windows.filter(w => optionWindows[selectedOption].includes(w.key))
-    : windows;
+
+  // Mapping from happened index to window keys (replace with real keys for wearables etc.)
+  const happenedHighlightMapping: Record<number, string[]> = {
+    0: ["wearable1","wearable2","wearable3"], 
+    1: ["healthassist1","healthassist2","healthassist3"], 
+    2: ["marketplace1","marketplace2","marketplace3"],
+    3: ["hollistic1","hollistic2","hollistic3"],
+  };
+
+// Wearable keys for filtering
+const wearableKeys = ["wearable1","wearable2","wearable3", "healthassist1","healthassist2","healthassist3", "marketplace1","marketplace2","marketplace3", "hollistic1","hollistic2","hollistic3"];
+
+// Compute which draggables to show
+const activeWindows: WindowConfig[] = happenedMode
+  ? (
+      hoveredHappened !== null
+        ? windows.filter(w => happenedHighlightMapping[hoveredHappened!]?.includes(w.key))
+        : []   // hide all until a theme is hovered/selected
+    )
+  : (
+      selectedOption >= 0 && selectedOption in optionWindows
+        ? windows.filter(w => optionWindows[selectedOption].includes(w.key))
+        : windows.filter(w => !wearableKeys.includes(w.key))   // initial screen: no wearables
+    );
 
   return (
     <>
@@ -512,11 +651,13 @@ To load a category, hover over the File menu, select Add, then choose your desir
           initialPos={{ x: 694, y: 299 }}
           initialZIndex={1}
           onOptionSelect={setSelectedOption}
+          onHappenedModeChange={setHappenedMode}
+          onHappenedHover={setHoveredHappened}
         />
       )}
 
       <AnimatePresence>
-        {showWindows && windowsToRender.map(cfg => (
+        {showWindows && activeWindows.map(cfg => (
           <MotionWindow
             key={cfg.key}
             cfg={cfg}

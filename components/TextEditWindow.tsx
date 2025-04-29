@@ -1,14 +1,14 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { DraggableWindow } from "./DraggableWindow";
 
-const introText = `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
+const introText = `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
 CATEGORY LOADED: Health
 Date Retrieved: 14 May 2040 | 09:17:33 EST
 ————————
 You may choose one of the following three health scenarios to explore further. Each scenario focuses on key developments reshaping healthcare in 2034. 
 
-↓  SCENARIOS  ↓`;
+↓  Use the arrow keys (↑ / ↓) to dive into a scenario  ↓`;
 
 /* ——————————————————————————————————————————— */
 
@@ -33,14 +33,40 @@ Meanwhile, holistic and alternative treatments—ranging from herbal medicine an
 
 Finally, health data itself has emerged as a valuable personal asset, leading to a thriving economy where individuals actively sell or lease detailed biometric data to companies, researchers, and healthcare startups, fundamentally altering privacy norms and economic structures in healthcare.`;
 
+const profitDetailText = `By 2034, the price tag on every medical decision is impossible to ignore. Sky-high costs and decades of deregulation have turned healthcare into a consumer marketplace where survival often depends on a family’s credit limit rather than a doctor’s skill. Faced with bankrupting hospital bills, many patients now design their own treatment plans at home: AI coaches guide bespoke physical-therapy regimens, countertop compounding kits mix personalized medications, and online forums swap raw pharmaceutical ingredients as casually as recipes.
+
+Financial despair has also normalized once-taboo choices. Physician-assisted death—marketed as a “compassionate debt-relief option”—is now a line item in many hospital brochures, sparking fierce ethical debate. Meanwhile, “crypto-health” tokens let clinics and patients bypass insurers entirely; a single scan of a QR-tattoo can settle a surgery bill or unlock an upgrade to premium post-op care.
+
+Comparison shopping platforms round out the landscape: with a few taps, users can sort heart-bypass packages by price, location, and recovery rating, much like booking flights or hotels in the early 2000s. Bargain hunters fly abroad for cut-rate procedures, while luxury hospitals advertise concierge gene therapies to the ultra-wealthy. In this marketplace, access to healing—and even the right to die—has become just another transaction.`;
+
+const enhancementDetailText = `In 2034 the line between healing and upgrading has vanished. Gene-editing kiosks in suburban malls promise sharper memories or age-reversal enzyme packs; construction firms advertise “exo-muscle” implants that let workers hoist steel beams bare-handed. Lifespans have sprinted past a century, straining housing, pensions, and even food systems as governments scramble to accommodate populations that simply don’t retire—or die—on schedule.
+
+The next generation may never know chance genetics at all. Prospective parents select embryo traits from glossy catalogs—disease immunity, height presets, perfect-pitch bundles—while bioethicists warn of a coming monoculture of designer children. Black-market labs push further, offering unauthorized CRISPR mods for IQ or extreme-sport endurance, leaving regulators in perpetual catch-up.
+
+Legal definitions of “human” lag behind the tech. Courts debate whether enhanced firefighters with heat-shielded skin qualify for the same labor protections as unmodified peers. Insurance actuaries rewrite risk tables daily as augmented vision, sub-dermal armor, and neural-speech chips hit the market. Each breakthrough forces society to choose between access and equity, progress and identity—constantly redrawing the frontier of what bodies can, and should, become.`;
+
+const happenedHeaderText = `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
+└─ QUERY: “How did this happen?”`;
+
+const happenedIntroText = `We get it — waking up to smart-patch bandages and DNA-insured mortgages is… a lot.
+Let’s rewind.
+
+On your screen you’ll see headlines, blog posts, and policy memos from 2020-2025 — the sparks that lit today’s bonfire of change.  
+
+Use the arrow keys (↑ / ↓) to navigate, click any headline to open the original source.:`;
+
 export const TextEditWindow: React.FC<{
   initialPos?: { x: number; y: number };
   initialZIndex?: number;
   onOptionSelect?: (index: number) => void;
+  onHappenedModeChange?: (mode: boolean) => void;
+  onHappenedHover?: (index: number | null) => void;
 }> = ({
   initialPos = { x: 200, y: 100 },
   initialZIndex = 10,
   onOptionSelect,
+  onHappenedModeChange,
+  onHappenedHover,
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [typingIdx, setTypingIdx] = useState(0);
@@ -51,6 +77,58 @@ export const TextEditWindow: React.FC<{
   const [detailMode, setDetailMode] = useState(false);
   const [detailDisplayedText, setDetailDisplayedText] = useState("");
   const [detailIdx, setDetailIdx] = useState(0);
+  const [currentDetailText, setCurrentDetailText] = useState(detailText);
+
+  const detailOptions = useMemo(() => ["go back", "how did this happen?"], []);
+  const [selectedDetail, setSelectedDetail] = useState(0);
+  const [selectedHappened, setSelectedHappened] = useState(0);
+  const [happenedMode, setHappenedMode] = useState(false);
+  const [happenedDisplayedText, setHappenedDisplayedText] = useState("");
+  const [happenedIdx, setHappenedIdx] = useState(0);
+  // Typing animation for happenedIntroText when in happened mode
+  useEffect(() => {
+    if (happenedMode && happenedIdx < happenedIntroText.length) {
+      const timeout = setTimeout(() => {
+        setHappenedDisplayedText(happenedIntroText.slice(0, happenedIdx + 1));
+        setHappenedIdx(happenedIdx + 1);
+      }, 18);
+      return () => clearTimeout(timeout);
+    }
+  }, [happenedMode, happenedIdx]);
+
+  useEffect(() => {
+    if (happenedMode && happenedIdx >= happenedIntroText.length) {
+      if (onHappenedModeChange) {
+        onHappenedModeChange(true);
+      }
+    }
+  }, [happenedMode, happenedIdx, onHappenedModeChange]);
+  useEffect(() => {
+    if (happenedMode && happenedIdx >= happenedIntroText.length) {
+      onHappenedHover?.(selectedHappened);
+    }
+  }, [happenedMode, happenedIdx, selectedHappened, onHappenedHover]);
+
+  // Auto-scroll for happened text
+  useEffect(() => {
+    if (happenedMode) {
+      containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
+    }
+  }, [happenedDisplayedText, happenedMode]);
+
+  const happenedOptions = useMemo(() => [
+    "Wearable & Continuous-Monitoring Tech",
+    "AI Symptom-Checkers & Virtual Health Assistants",
+    "Personal Health-Data Marketplace",
+    "Holistic & Alternative Therapies Go Mainstream (and Get Covered)"
+  ], []);
+
+  const detailHeaderText = useMemo(() => {
+    const fileName = options[selected].file;
+    return `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
+└─ QUERY: "${fileName}"
+Date Retrieved: 14 May 2040 | 09:17:33 EST`;
+  }, [selected]);
 
   // Notify parent of the newly selected option (after options are visible)
   useEffect(() => {
@@ -92,26 +170,93 @@ export const TextEditWindow: React.FC<{
   useEffect(() => {
     if (!showOptions || revealedOptions < options.length) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      // If in detail mode, intercept keys
+      if (detailMode && detailIdx >= currentDetailText.length) {
+        // DETAIL PAGE navigation (when happenedMode is false)
+        if (!happenedMode) {
+          if (e.key === "ArrowUp") {
+            setSelectedDetail(prev => prev === 0 ? detailOptions.length - 1 : prev - 1);
+          } else if (e.key === "ArrowDown") {
+            setSelectedDetail(prev => prev === detailOptions.length - 1 ? 0 : prev + 1);
+          } else if (e.key === "Enter") {
+            if (selectedDetail === 0) {
+              // go back
+              setDetailMode(false);
+              setHappenedMode(false);
+              if (onHappenedModeChange) {
+                onHappenedModeChange(false);
+              }
+              if (onHappenedHover) {
+                onHappenedHover(null);
+              }
+            } else if (selectedDetail === 1) {
+              // enter happened page
+              setHappenedMode(true);
+            }
+          }
+          return;
+        }
+        // HAPPENED PAGE navigation
+        if (happenedMode) {
+          if (e.key === "ArrowUp") {
+            setSelectedHappened(prev =>
+              prev === 0 ? happenedOptions.length - 1 : prev - 1
+            );
+          } else if (e.key === "ArrowDown") {
+            setSelectedHappened(prev =>
+              prev === happenedOptions.length - 1 ? 0 : prev + 1
+            );
+          } else if (e.key === "Enter") {
+            // (no action yet)
+          }
+          return;
+        }
+      }
+
+      // Navigation for initial options
       if (e.key === "ArrowUp") {
         setSelected((prev) => (prev === 0 ? options.length - 1 : prev - 1));
       } else if (e.key === "ArrowDown") {
         setSelected((prev) => (prev === options.length - 1 ? 0 : prev + 1));
       } else if (e.key === "Enter") {
         if (selected === 0) {
-          // Enter on option 0: switch to detail view
           setDetailMode(true);
-          // reset detail typing
+          setCurrentDetailText(detailText);
+          setDetailDisplayedText("");
+          setDetailIdx(0);
+        } else if (selected === 1) {
+          setDetailMode(true);
+          setCurrentDetailText(profitDetailText);
+          setDetailDisplayedText("");
+          setDetailIdx(0);
+        } else if (selected === 2) {
+          setDetailMode(true);
+          setCurrentDetailText(enhancementDetailText);
           setDetailDisplayedText("");
           setDetailIdx(0);
         } else {
-          // default behavior for other options
           if (onOptionSelect) onOptionSelect(selected);
         }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showOptions, revealedOptions, selected, onOptionSelect]);
+  }, [
+    showOptions,
+    revealedOptions,
+    selected,
+    onOptionSelect,
+    detailMode,
+    detailIdx,
+    currentDetailText,
+    selectedDetail,
+    detailOptions,
+    selectedHappened,
+    happenedOptions,
+    happenedMode,
+    onHappenedModeChange,
+    onHappenedHover,
+  ]);
 
   // Auto-scroll to bottom only while typing the intro text
   useEffect(() => {
@@ -130,14 +275,14 @@ export const TextEditWindow: React.FC<{
 
   // Typing animation for detailText when in detail mode
   useEffect(() => {
-    if (detailMode && detailIdx < detailText.length) {
+    if (detailMode && detailIdx < currentDetailText.length) {
       const timeout = setTimeout(() => {
-        setDetailDisplayedText(detailText.slice(0, detailIdx + 1));
+        setDetailDisplayedText(currentDetailText.slice(0, detailIdx + 1));
         setDetailIdx(detailIdx + 1);
       }, 18);
       return () => clearTimeout(timeout);
     }
-  }, [detailMode, detailIdx]);
+  }, [detailMode, detailIdx, currentDetailText]);
 
   // Auto-scroll container while detail text is streaming
   useEffect(() => {
@@ -146,6 +291,27 @@ export const TextEditWindow: React.FC<{
     }
   }, [detailDisplayedText, detailMode]);
 
+  useEffect(() => {
+    if (detailMode && detailIdx >= currentDetailText.length) {
+      if (selectedDetail === 1) {
+        // Scroll to selected happened option
+        const el = document.getElementById(`happened-option-${selectedHappened}`);
+        el?.scrollIntoView({ block: "nearest" });
+      } else {
+        const el = document.getElementById(`detail-option-${selectedDetail}`);
+        el?.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedDetail, selectedHappened, detailMode, happenedMode, detailIdx, currentDetailText.length]);
+
+  // Cleanup: clear happened hover on unmount
+  useEffect(() => {
+    return () => {
+      if (onHappenedHover) {
+        onHappenedHover(null);
+      }
+    };
+  }, [onHappenedHover]);
   return (
     <DraggableWindow
       id="text-editor"
@@ -199,11 +365,68 @@ export const TextEditWindow: React.FC<{
               )}
             </>
           )}
-          {detailMode && (
-            <div
-              className="whitespace-pre-wrap"
-              dangerouslySetInnerHTML={{ __html: detailDisplayedText }}
-            />
+          {/* DETAIL PAGE */}
+          {detailMode && !happenedMode && (
+            <>
+              <div className="font-mono text-base whitespace-pre-wrap mb-2">
+                {detailHeaderText}
+              </div>
+              <div
+                className="whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: detailDisplayedText }}
+              />
+              {detailIdx >= currentDetailText.length && (
+                <div className="mt-4">
+                  {detailOptions.map((opt, idx) => (
+                    <div
+                      id={`detail-option-${idx}`}
+                      key={opt}
+                      className={`mb-2 cursor-pointer pl-2 ${
+                        selectedDetail === idx ? "bg-blue-50 text-blue-700" : "text-gray-900"
+                      }`}
+                    >
+                      <span className="mr-2">{">"}</span>
+                      <span className="font-mono">{opt}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* HAPPENED PAGE */}
+          {detailMode && happenedMode && (
+            <>
+              <div className="font-mono text-base whitespace-pre-wrap mb-2">
+                {happenedHeaderText}
+              </div>
+              <div
+                className="whitespace-pre-wrap mb-4"
+                dangerouslySetInnerHTML={{ __html: happenedDisplayedText.replace(/\n/g, "<br/>") }}
+              />
+          {happenedIdx >= happenedIntroText.length && (
+            <div className="mt-4">
+              {happenedOptions.map((opt, idx) => (
+                <div
+                  id={`happened-option-${idx}`}
+                  key={opt}
+                  className={`mb-2 cursor-pointer pl-2 ${
+                    selectedHappened === idx ? "bg-blue-50 text-blue-700" : "text-gray-900"
+                  }`}
+                  onMouseEnter={() => {
+                    setSelectedHappened(idx);
+                    if (onHappenedHover) {
+                      onHappenedHover(idx);
+                    }
+                  }}
+                >
+                  <span className="mr-2">{">"}</span>
+                  <span className="font-mono">{opt}</span>
+                </div>
+              ))}
+            </div>
+          )}
+            </>
           )}
         </div>
       </div>
