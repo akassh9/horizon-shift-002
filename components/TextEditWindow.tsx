@@ -46,14 +46,25 @@ The next generation may never know chance genetics at all. Prospective parents s
 Legal definitions of “human” lag behind the tech. Courts debate whether enhanced firefighters with heat-shielded skin qualify for the same labor protections as unmodified peers. Insurance actuaries rewrite risk tables daily as augmented vision, sub-dermal armor, and neural-speech chips hit the market. Each breakthrough forces society to choose between access and equity, progress and identity—constantly redrawing the frontier of what bodies can, and should, become.`;
 
 const happenedHeaderText = `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL
-└─ QUERY: “How did this happen?”`;
+└─ QUERY: “How did this happen?” ──  PROFILE: Dr.Me`;
 
 const happenedIntroText = `We get it — waking up to smart-patch bandages and DNA-insured mortgages is… a lot.
 Let’s rewind.
 
 On your screen you’ll see headlines, blog posts, and policy memos from 2020-2025 — the sparks that lit today’s bonfire of change.  
 
-Use the arrow keys (↑ / ↓) to navigate, click any headline to open the original source.:`;
+Use the arrow keys (↑ / ↓) to navigate, click any headline to open the original source:`;
+
+// ---- Profit Over Patient “How did this happen?” content ----
+const profitHappenedHeaderText = `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL  
+└─ QUERY: “How did this happen?”  ──  PROFILE: Profit Over Patient`;
+
+const profitHappenedIntroText = `We realize the biggest sticker-shock isn’t waking up—it’s the bill that greets you afterward.  
+Let’s roll back the tape.
+
+Headlines from 2020 – 2025 will now populate around your console: policy memos, market launches, bankruptcy stats—each a spark that turned healthcare into today’s marketplace.  
+
+Use the arrow keys (↑ / ↓) to navigate, click any headline to open the original source:`;
 
 export const TextEditWindow: React.FC<{
   initialPos?: { x: number; y: number };
@@ -61,12 +72,14 @@ export const TextEditWindow: React.FC<{
   onOptionSelect?: (index: number) => void;
   onHappenedModeChange?: (mode: boolean) => void;
   onHappenedHover?: (index: number | null) => void;
+  onHappenedScenarioChange?: (scenario: number) => void;
 }> = ({
   initialPos = { x: 200, y: 100 },
   initialZIndex = 10,
   onOptionSelect,
   onHappenedModeChange,
   onHappenedHover,
+  onHappenedScenarioChange,
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [typingIdx, setTypingIdx] = useState(0);
@@ -85,29 +98,75 @@ export const TextEditWindow: React.FC<{
   const [happenedMode, setHappenedMode] = useState(false);
   const [happenedDisplayedText, setHappenedDisplayedText] = useState("");
   const [happenedIdx, setHappenedIdx] = useState(0);
-  // Typing animation for happenedIntroText when in happened mode
+  // Happened‑page config per scenario index (0 = Dr Me, 1 = Profit, 2 = Enhancement)
+  const happenedConfig = [
+    {
+      header: happenedHeaderText,
+      intro: happenedIntroText,
+      options: [
+        "Wearable & Continuous-Monitoring Tech",
+        "AI Symptom-Checkers & Virtual Health Assistants",
+        "Personal Health-Data Marketplace",
+        "Holistic & Alternative Therapies Go Mainstream (and Get Covered)",
+        "Return to Health Start",
+      ],
+    },
+    {
+      header: profitHappenedHeaderText,
+      intro: profitHappenedIntroText,
+      options: [
+        "DIY & Open-Access Care",
+        "Medical-Debt Crisis (Debt or Death?)",
+        "Crypto-Health Payments",
+        "Shop-Compare-Save Platforms",
+        "Return to Health Start",
+      ],
+    },
+    {
+      // Whole New World scenario
+      header: `[SYS-ARCHIVE v3.7]  •  NODE: PERSONAL_REINTEGRATION_PROTOCOL  
+└─ QUERY: “How did this happen?”  ──  PROFILE: A ‘Whole’ New World`,
+      intro: `The year is 2034 and the human body is no longer a biological limit—it’s a design space. If that sounds impossible, let’s rewind and watch the tipping points unfold.
+
+In a moment you’ll see news flashes, research papers, and policy rulings from 2020-2025 floating around your console. These are the breadcrumbs that led from first-in-human CRISPR trials to exo-muscle implants at the hardware store.  
+
+Use the arrow keys (↑ / ↓) to navigate, click any headline to open the original source:`,
+      options: [
+        "Life-Extension & Longevity",
+        "Human Enhancement & Prosthetics",
+        "Genetic Editing & Designer Babies",
+        "Ethics, Regulation & Identity",
+        "Return to Health Start",
+      ],
+    },
+  ];
+
+  const [happenedScenario, setHappenedScenario] = useState<number>(0);
+  const currentHappened = happenedConfig[happenedScenario];
+
+  // Typing animation for happenedIntroText (now currentHappened.intro) when in happened mode
   useEffect(() => {
-    if (happenedMode && happenedIdx < happenedIntroText.length) {
+    if (happenedMode && happenedIdx < currentHappened.intro.length) {
       const timeout = setTimeout(() => {
-        setHappenedDisplayedText(happenedIntroText.slice(0, happenedIdx + 1));
+        setHappenedDisplayedText(currentHappened.intro.slice(0, happenedIdx + 1));
         setHappenedIdx(happenedIdx + 1);
       }, 18);
       return () => clearTimeout(timeout);
     }
-  }, [happenedMode, happenedIdx]);
+  }, [happenedMode, happenedIdx, currentHappened.intro]);
 
   useEffect(() => {
-    if (happenedMode && happenedIdx >= happenedIntroText.length) {
+    if (happenedMode && happenedIdx >= currentHappened.intro.length) {
       if (onHappenedModeChange) {
         onHappenedModeChange(true);
       }
     }
-  }, [happenedMode, happenedIdx, onHappenedModeChange]);
+  }, [happenedMode, happenedIdx, onHappenedModeChange, currentHappened.intro.length]);
   useEffect(() => {
-    if (happenedMode && happenedIdx >= happenedIntroText.length) {
+    if (happenedMode && happenedIdx >= currentHappened.intro.length) {
       onHappenedHover?.(selectedHappened);
     }
-  }, [happenedMode, happenedIdx, selectedHappened, onHappenedHover]);
+  }, [happenedMode, happenedIdx, selectedHappened, onHappenedHover, currentHappened.intro.length]);
 
   // Auto-scroll for happened text
   useEffect(() => {
@@ -115,13 +174,6 @@ export const TextEditWindow: React.FC<{
       containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
     }
   }, [happenedDisplayedText, happenedMode]);
-
-  const happenedOptions = useMemo(() => [
-    "Wearable & Continuous-Monitoring Tech",
-    "AI Symptom-Checkers & Virtual Health Assistants",
-    "Personal Health-Data Marketplace",
-    "Holistic & Alternative Therapies Go Mainstream (and Get Covered)"
-  ], []);
 
   const detailHeaderText = useMemo(() => {
     const fileName = options[selected].file;
@@ -192,22 +244,35 @@ Date Retrieved: 14 May 2040 | 09:17:33 EST`;
             } else if (selectedDetail === 1) {
               // enter happened page
               setHappenedMode(true);
+              onHappenedScenarioChange?.(selected);
+              setHappenedScenario(selected);       // 0 = Dr Me, 1 = Profit, 2 = Enhancement
+              setHappenedDisplayedText("");
+              setHappenedIdx(0);
+              setSelectedHappened(0);
             }
           }
           return;
         }
         // HAPPENED PAGE navigation
         if (happenedMode) {
+          const len = currentHappened.options.length;
           if (e.key === "ArrowUp") {
             setSelectedHappened(prev =>
-              prev === 0 ? happenedOptions.length - 1 : prev - 1
+              prev === 0 ? len - 1 : prev - 1
             );
           } else if (e.key === "ArrowDown") {
             setSelectedHappened(prev =>
-              prev === happenedOptions.length - 1 ? 0 : prev + 1
+              prev === len - 1 ? 0 : prev + 1
             );
           } else if (e.key === "Enter") {
-            // (no action yet)
+            // if "Return to Health Start" selected
+            if (selectedHappened === len - 1) {
+              setDetailMode(false);
+              setHappenedMode(false);
+              if (onHappenedModeChange) onHappenedModeChange(false);
+              if (onHappenedHover) onHappenedHover(null);
+              setSelected(0);
+            }
           }
           return;
         }
@@ -252,10 +317,11 @@ Date Retrieved: 14 May 2040 | 09:17:33 EST`;
     selectedDetail,
     detailOptions,
     selectedHappened,
-    happenedOptions,
     happenedMode,
     onHappenedModeChange,
     onHappenedHover,
+    onHappenedScenarioChange,
+    currentHappened.options.length,
   ]);
 
   // Auto-scroll to bottom only while typing the intro text
@@ -398,15 +464,15 @@ Date Retrieved: 14 May 2040 | 09:17:33 EST`;
           {detailMode && happenedMode && (
             <>
               <div className="font-mono text-base whitespace-pre-wrap mb-2">
-                {happenedHeaderText}
+                {currentHappened.header}
               </div>
               <div
                 className="whitespace-pre-wrap mb-4"
                 dangerouslySetInnerHTML={{ __html: happenedDisplayedText.replace(/\n/g, "<br/>") }}
               />
-          {happenedIdx >= happenedIntroText.length && (
+          {happenedIdx >= currentHappened.intro.length && (
             <div className="mt-4">
-              {happenedOptions.map((opt, idx) => (
+              {currentHappened.options.map((opt, idx) => (
                 <div
                   id={`happened-option-${idx}`}
                   key={opt}
