@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TextEditWindow } from '../../components/TextEditWindow';
 import { DraggableWindow } from '../../components/DraggableWindow';
+import { TextEditWindow } from '../../components/TextEditWindow';
 import { MacMenuBar } from '../../components/MacMenuBar';
 import Image from 'next/image';
 import { AnimatePresence, motion } from "framer-motion";
@@ -908,6 +908,445 @@ const windows: WindowConfig[] = [
     type: "image",
     src: "/images/altfin3.png",
   },
+//entertainment main
+  //fifth wall
+  {
+    key: "fifth1",
+    pos: { x: 169, y: 116 },
+    size: { width: 300, height: 168 },
+    type: "image",
+    src: "/images/fifth1.jpg",
+  },
+  {
+    key: "fifth1-text",
+    pos: { x: 34, y: 113 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Interaction at its core.",
+  },
+  {
+    key: "fifth2",
+    pos: { x: 60, y: 687 },
+    size: { width: 250, height: 350.17 },
+    type: "image",
+    src: "/images/fifth2.jpg",
+  },
+  {
+    key: "fifth2-text",
+    pos: { x: 271, y: 663 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Walking into Art.",
+  },
+  {
+    key: "fifth3",
+    pos: { x: 1640, y: 400 },
+    size: { width: 300, height: 225 },
+    type: "image",
+    src: "/images/fifth3.jpg",
+  },
+  {
+    key: "fifth3-text",
+    pos: { x: 1894, y: 614 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Real Fictional",
+  },
+  {
+    key: "fifth4-text",
+    pos: { x: 792, y: 1040 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "A new Camera, a new Screen",
+  },
+  {
+    key: "fifth4",
+    pos: { x: 792, y: 888 },
+    size: { width: 400, height: 176.6 },
+    type: "image",
+    src: "/images/fifth4.png",
+  },
+    //headlines for fifth wall
+    //immersive AR/VR
+    {
+      key: "imm1",         
+      pos: { x: 120, y: 953 },       
+      size: { width: 700, height: 115.94 },
+      type: "image",
+      src: "/images/imm1.png",
+    },
+    {
+      key: "imm2",
+      pos: { x: 72, y: 85 },
+      size: { width: 500, height: 468.41 },
+      type: "image",
+      src: "/images/imm2.png",
+    },
+    {
+      key: "imm3",
+      pos: { x: 1285, y: 849 },
+      size: { width: 600, height: 69 },
+      type: "image",
+      src: "/images/imm3.png",
+    },
+      //Experential installations and pop ups
+    {
+      key: "exp1",
+      pos: { x: 106, y: 150 },
+      size: { width: 400, height: 150 },
+      type: "image",
+      src: "/images/exp1.png",
+    },
+    {
+      key: "exp2",
+      pos: { x: 1285, y: 849 },
+      size: { width: 600, height: 157.5 },
+      type: "image",
+      src: "/images/exp2.png",
+    },
+    {
+      key: "exp3",          
+      pos: { x: 83, y: 683 },      
+      size: { width: 550, height: 102.67 },
+      type: "image",
+      src: "/images/exp3.png",
+    },
+      //Wearables and neural feel tech
+    {
+      key: "wear1",
+      pos: { x: 1376, y: 74 },
+      size: { width: 500, height: 198.66 },
+      type: "image",
+      src: "/images/wear1.png",
+    },
+    {
+      key: "wear2",
+      pos: { x: 1285, y: 849 },
+      size: { width: 600, height: 205 },
+      type: "image",
+      src: "/images/wear2.png",
+    },
+    {
+      key: "wear3",          
+      pos: { x: 77, y: 370 },       
+      size: { width: 550, height: 603 },
+      type: "image",
+      src: "/images/enhance2.webp",
+    },
+      //fandom toursim
+    {
+      key: "fan1",
+      pos: { x: 1091, y: 848 },
+      size: { width: 700, height: 106.46 },
+      type: "image",
+      src: "/images/fan1.png",
+    },
+    {
+      key: "fan2",
+      pos: { x: 23, y: 101 },
+      size: { width: 600, height: 101 },
+      type: "image",
+      src: "/images/fan2.png",
+    },
+    {
+      key:"fan3",
+      pos: { x: 182, y: 939 },
+      size: { width: 800, height: 129 },
+      type: "image",
+      src: "/images/fan3.png",
+    },
+    //when the ai credits roll
+   {
+    key: "ai1",
+    pos: { x: 1506, y: 702 },
+    size: { width: 250, height: 250.4 },
+    type: "image",
+    src: "/images/ai1.png",
+   },
+  {
+    key: "ai1-text",
+    pos: { x: 1539, y: 715 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Investor Predicaments.",
+  },
+  {
+    key: "ai2",
+    pos: { x: 474, y: 789 },
+    size: { width: 210, height: 261.84 },
+    type: "image",
+    src: "/images/ai2.webp",
+  },
+  {
+    key: "ai2-text",
+    pos: { x: 360, y: 797 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Execution Bloopers",
+  },
+  {
+    key: "ai3",
+    pos: { x: 1109, y: 84 },
+    size: { width: 300, height: 168 },
+    type: "image",
+    src: "/images/ai3.webp",
+  },
+  {
+    key: "ai3-text",
+    pos: { x: 938, y: 55 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: " Creativity Crisis. ",
+  },
+  {
+    key: "ai4-text",
+    pos: { x: 1953, y: 892 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "legal pushback.",
+  },
+  {
+    key: "ai4",
+    pos: { x: 1924, y: 723 },
+    size: { width: 210, height: 148.8 },
+    type: "image",
+    src: "/images/ai4.png",
+  },
+    //headlines for when the ai credits roll
+    //Generative‑AI Tool Investments
+    {
+      key: "gen1",         
+      pos: { x: 1255, y: 856 },       
+      size: { width: 700, height: 205 },
+      type: "image",
+      src: "/images/inv1.png",
+    },
+    {
+      key: "gen2",
+      pos: { x: 43, y: 104 },
+      size: { width: 500, height: 344.41 },
+      type: "image",
+      src: "/images/inv2.png",
+    },
+    {
+      key: "gen3",
+      pos: { x: 1460, y: 141 },
+      size: { width: 600, height: 94 },
+      type: "image",
+      src: "/images/inv3.png",
+    },
+      //AI Controversies & Legal Pushback
+    {
+      key: "cont1",
+      pos: { x: 106, y: 150 },
+      size: { width: 700, height: 108.26 },
+      type: "image",
+      src: "/images/cont1.png",
+    },
+    {
+      key: "cont2",
+      pos: { x: 1396, y: 146 },
+      size: { width: 600, height: 86 },
+      type: "image",
+      src: "/images/cont2.png",
+    },
+    {
+      key: "cont3",          
+      pos: { x: 120, y: 890 },      
+      size: { width: 550, height: 78.83 },
+      type: "image",
+      src: "/images/cont3.png",
+    },
+      //Automation of Creative Roles
+    {
+      key: "auto1",
+      pos: { x: 1170, y: 59 },
+      size: { width: 700, height: 198.66 },
+      type: "image",
+      src: "/images/auto1.png",
+    },
+    {
+      key: "auto2",
+      pos: { x: 1285, y: 849 },
+      size: { width: 600, height: 91 },
+      type: "image",
+      src: "/images/auto2.png",
+    },
+    {
+      key: "auto3",          
+      pos: { x: 139, y: 104 },       
+      size: { width: 540, height: 99.91 },
+      type: "image",
+      src: "/images/auto3.png",
+    },
+      //Investor Uncertainty & Market Shifts
+    {
+      key: "unc1",
+      pos: { x: 1380, y: 876 },
+      size: { width: 700, height: 106.46 },
+      type: "image",
+      src: "/images/unc1.png",
+    },
+    {
+      key: "unc2",
+      pos: { x: 23, y: 101 },
+      size: { width: 600, height: 101 },
+      type: "image",
+      src: "/images/unc2.png",
+    },
+    {
+      key:"unc3",
+      pos: { x: 83, y: 851 },
+      size: { width: 800, height: 166 },
+      type: "image",
+      src: "/images/unc3.png",
+    },
+  //artists are king 
+  {
+    key: "king1",
+    pos: { x: 637, y: 27 },
+    size: { width: 350, height: 233.33 },
+    type: "image",
+    src: "/images/king1.png",
+  },
+  {
+    key: "king1-text",
+    pos: { x: 550, y: 199 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "The artist manifesto.",
+  },
+  {
+    key: "king2",
+    pos: { x: 99, y: 345 },
+    size: { width: 200, height: 196.93 },
+    type: "image",
+    src: "/images/king2.png",
+  },
+  {
+    key: "king2-text",
+    pos: { x: 310, y: 436 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Authenticity on scale.",
+  },
+  {
+    key: "king3",
+    pos: { x: 1221, y: 821 },
+    size: { width: 210, height: 316.6 },
+    type: "image",
+    src: "/images/king3.png",
+  },
+  {
+    key: "king3-text",
+    pos: { x: 1161, y: 1074 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: " Music Tour or Cultural Phenomenon?",
+  },
+  {
+    key: "king4",
+    pos: { x: 1823, y: 55 },
+    size: { width: 210, height: 197 },
+    type: "image",
+    src: "/images/king4.jpg",
+  },
+  {
+    key: "king4-text",
+    pos: { x: 1590, y: 179 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Diverse Music Charts",
+  },
+    //headlines for artists are king
+    //Authenticity & Phenomenon Tours
+    {
+      key: "auth1",         
+      pos: { x: 67, y: 828 },       
+      size: { width: 700, height: 281 },
+      type: "image",
+      src: "/images/auth1.png",
+    },
+    {
+      key: "auth2",
+      pos: { x: 83, y: 77 },
+      size: { width: 700, height: 163 },
+      type: "image",
+      src: "/images/auth2.png",
+    },
+    {
+      key: "auth3",
+      pos: { x: 1282, y: 903 },
+      size: { width: 600, height: 140 },
+      type: "image",
+      src: "/images/auth3.png",
+    },
+      //Diverse Charts & Non‑Formulaic Hits
+    {
+      key: "div1",
+      pos: { x: 73, y: 200 },
+      size: { width: 500, height: 215 },
+      type: "image",
+      src: "/images/div1.png",
+    },
+    {
+      key: "div2",
+      pos: { x: 666, y: 127 },
+      size: { width: 600, height: 97.5 },
+      type: "image",
+      src: "/images/div2.png",
+    },
+    {
+      key: "div3",          
+      pos: { x: 83, y: 683 },      
+      size: { width: 550, height: 195.67 },
+      type: "image",
+      src: "/images/div3.png",
+    },
+      //Indie Success & VC Funding
+    {
+      key: "ind1",
+      pos: { x: 1411, y: 57 },
+      size: { width: 500, height: 198.66 },
+      type: "image",
+      src: "/images/ind1.png",
+    },
+    {
+      key: "ind2",
+      pos: { x: 1285, y: 849 },
+      size: { width: 600, height: 171 },
+      type: "image",
+      src: "/images/ind2.png",
+    },
+    {
+      key: "ind3",          
+      pos: { x: 66, y: 93 },       
+      size: { width: 800, height: 99.91 },
+      type: "image",
+      src: "/images/ind3.png",
+    },
+      //Direct‑to‑Fan Platforms & Monetization
+    {
+      key: "d21",
+      pos: { x: 1091, y: 848 },
+      size: { width: 700, height: 270.46 },
+      type: "image",
+      src: "/images/d21.png",
+    },
+    {
+      key: "d22",
+      pos: { x: 23, y: 101 },
+      size: { width: 600, height: 153 },
+      type: "image",
+      src: "/images/d22.png",
+    },
+    {
+      key:"d23",
+      pos: { x: 182, y: 939 },
+      size: { width: 800, height: 164 },
+      type: "image",
+      src: "/images/d23.png",
+    },
 ];
 // --- hyperlinks for special draggables ---
 const linkMap: Record<string, string> = {
@@ -999,7 +1438,10 @@ function MotionWindow({
   return (
     <motion.div
       key={cfg.key}
-      onPointerDown={() => bringToFront(cfg.key)}
+      onPointerDown={() => {
+        // Don’t bring “king4” to front
+        if (cfg.key !== "king4") bringToFront(cfg.key);
+      }}
       style={{ }}
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
@@ -1009,6 +1451,7 @@ function MotionWindow({
       <DraggableWindow
         id={cfg.key}
         initialPos={cfg.pos}
+        initialZIndex={cfg.key === "king4" ? 0 : undefined}
         width={cfg.size.width}
         height={cfg.size.height}
         className={`${
@@ -1059,26 +1502,12 @@ export default function Home() {
   const [happenedMode, setHappenedMode] = useState(false);
   const [hoveredHappened, setHoveredHappened] = useState<number | null>(null);
   const [helpAnswer, setHelpAnswer] = useState("");
-  const [centerPos, setCenterPos] = useState({ x: 694, y: 299 });
   // Z-index for help window
   const [zCounter, setZCounter] = useState(1);
   const [helpZIndex, setHelpZIndex] = useState(zCounter + 1);
   // State for the current happened scenario
   const [happenedScenario, setHappenedScenario] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
-  useEffect(() => {
-    function updateCenter() {
-      const width = 600; // width of page2 window
-      const height = 400; // height of page2 window
-      setCenterPos({
-        x: window.innerWidth / 2 - width / 2,
-        y: window.innerHeight / 2 - height / 2,
-      });
-    }
-    window.addEventListener("resize", updateCenter);
-    updateCenter();
-    return () => window.removeEventListener("resize", updateCenter);
-  }, []);
 
   // Determine if user has confirmed "yes"
   const page2Active = helpAnswer.trim().toLowerCase() === "yes";
@@ -1195,8 +1624,16 @@ To load a category, hover over the File menu, select Add, then choose your desir
     1: ["arms1-text", "arms2-text", "arms3-text", "arms4-text"],
     2: ["cliff1-text", "cliff2-text", "cliff3-text", "cliff4-text"],
   };
+  // Highlights for Entertainment scenario text draggables
+  const entertainmentOptionHighlights: Record<number, string[]> = {
+    0: ["fifth1-text", "fifth2-text", "fifth3-text", "fifth4-text"],
+    1: ["ai1-text", "ai2-text", "ai3-text", "ai4-text"],
+    2: ["king1-text", "king2-text", "king3-text", "king4-text"],
+  };
   const highlightedKeys = selectedCategory === "education"
     ? (educationOptionHighlights[selectedOption] || [])
+    : selectedCategory === "entertainment"
+    ? (entertainmentOptionHighlights[selectedOption] || [])
     : (optionHighlights[selectedOption] || []);
 
   // Map option index to window keys to show
@@ -1222,8 +1659,16 @@ To load a category, hover over the File menu, select Add, then choose your desir
       "cliff4",   "cliff4-text"
     ],
   };
+  // for Entertainment category
+  const entertainmentOptionWindows: Record<number, string[]> = {
+    0: ["fifth1", "fifth1-text", "fifth2", "fifth2-text", "fifth3", "fifth3-text", "fifth4", "fifth4-text"],
+    1: ["ai1", "ai1-text", "ai2", "ai2-text", "ai3", "ai3-text", "ai4", "ai4-text"],
+    2: ["king1", "king1-text", "king2", "king2-text", "king3", "king3-text", "king4", "king4-text"],
+  };
   // Flatten all education option keys to exclude them in other categories
   const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
+  // Flatten all entertainment option keys to exclude them in other categories
+  const allEntertainmentOptionKeys = Object.values(entertainmentOptionWindows).flat();
   // Flatten all health option keys for initial display
   const allHealthWindowKeys = Object.values(optionWindows).flat();
 
@@ -1280,6 +1725,31 @@ To load a category, hover over the File menu, select Add, then choose your desir
     },
   };
 
+  // Draggables per entertainment scenario and per happened-option index
+  const entertainmentScenarioDraggables: Record<number, Record<number, string[]>> = {
+    0: { // Fifth Wall
+      0: ["imm1","imm2","imm3","imm4"],
+      1: ["exp1","exp2","exp3","exp4"],
+      2: ["wear1","wear2","wear3","wear4"],
+      3: ["fan1","fan2","fan3","fan4"],
+      4: [], // Return to Entertainment Start
+    },
+    1: { // AI Credits Roll
+      0: ["gen1","gen2","gen3","gen4"],
+      1: ["cont1","cont2","cont3","cont4"],
+      2: ["auto1","auto2","auto3","auto4"],
+      3: ["unc1","unc2","unc3","unc4"],
+      4: [],
+    },
+    2: { // Artists Are King
+      0: ["auth1","auth2","auth3","auth4"],
+      1: ["div1","div2","div3","div4"],
+      2: ["ind1","ind2","ind3","ind4"],
+      3: ["d21","d22","d23","d24"],
+      4: [],
+    },
+  };
+
   // Flatten all scenario draggables into one list for filtering
   const allScenarioKeys = Object.values(scenarioDraggables)
     .flatMap(optMap => Object.values(optMap))
@@ -1296,7 +1766,14 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 educationScenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
               )
             : [];
+        } else if (selectedCategory === "entertainment") {
+          return hoveredHappened !== null
+            ? windows.filter(w =>
+                entertainmentScenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
+              )
+            : [];
         } else {
+          // health
           return hoveredHappened !== null
             ? windows.filter(w =>
                 scenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
@@ -1329,11 +1806,27 @@ To load a category, hover over the File menu, select Add, then choose your desir
           return windows.filter(w =>
             allHealthWindowKeys.includes(w.key)
           );
+        } else if (selectedCategory === "entertainment") {
+          // Entertainment: show draggables for entertainment category
+          // Before any option selected, show all Entertainment draggables
+          if (selectedOption < 0) {
+            return windows.filter(w =>
+              allEntertainmentOptionKeys.includes(w.key)
+            );
+          }
+          // Once an option is selected, show only that option's draggables
+          return entertainmentOptionWindows[selectedOption]
+            ? windows.filter(w =>
+                entertainmentOptionWindows[selectedOption].includes(w.key)
+              )
+            : [];
         } else {
-          // other categories (e.g., entertainment)
+          // other categories (fallback)
           return windows.filter(w =>
             !allScenarioKeys.includes(w.key) &&
-            !allEducationOptionKeys.includes(w.key)
+            !allEducationOptionKeys.includes(w.key) &&
+            !allHealthWindowKeys.includes(w.key) &&
+            !allEntertainmentOptionKeys.includes(w.key)
           );
         }
       })();
@@ -1357,7 +1850,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
           >
             <DraggableWindow
               id="help"
-              initialPos={centerPos}
+              initialPos={{ x: 760, y: 354.5 }}
               width={600}
               height={400}
               className="bg-white text-black shadow-md"
@@ -1373,7 +1866,9 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 <h1 className="ml-3 text-lg font-semibold">Help Guide – Page 2</h1>
                 <span className="ml-auto text-sm text-gray-500">April 28, 2025 at 9:07 PM</span>
               </div>
-              {/* Body */}
+              <div className="px-4 py-3 mb-4 font-mono text-sm text-gray-800 bg-blue-50 border-l-4 border-blue-400 rounded-md italic shadow-sm">
+                Calibrate: Press <kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>+</kbd>/<kbd>-</kbd> to zoom in and out until this window is centered on your screen.
+              </div>
               <div className="px-4 py-3 font-mono whitespace-pre-wrap">
                 {page2DisplayedText}
               </div>
@@ -1389,7 +1884,11 @@ To load a category, hover over the File menu, select Add, then choose your desir
           >
             <DraggableWindow
               id="help"
-              initialPos={helpAnswer.trim().toLowerCase() === "yes" ? centerPos : { x: 694, y: 299 }}
+              initialPos={
+                helpAnswer.trim().toLowerCase() === "yes"
+                  ? { x: 760, y: 354.5 }
+                  : { x: 694, y: 299 }
+              }
               width={helpAnswer.trim().toLowerCase() === "yes" ? 600 : 800}
               height={helpAnswer.trim().toLowerCase() === "yes" ? 400 : 600}
               className="bg-white text-black shadow-md"

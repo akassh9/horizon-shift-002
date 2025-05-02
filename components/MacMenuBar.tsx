@@ -18,6 +18,8 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
 }) => {
   const [fileOpen, setFileOpen] = useState(false);
   const fileRef = useRef<HTMLSpanElement>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyRef = useRef<HTMLSpanElement>(null);
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -34,6 +36,21 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
     }
     return () => document.removeEventListener("mousedown", handleClick);
   }, [fileOpen]);
+
+  React.useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        historyRef.current &&
+        !historyRef.current.contains(e.target as Node)
+      ) {
+        setHistoryOpen(false);
+      }
+    }
+    if (historyOpen) {
+      document.addEventListener("mousedown", handleClick);
+    }
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [historyOpen]);
 
   return (
     <div
@@ -114,15 +131,34 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
               {item}
             </span>
           ) : item === "History" ? (
-            <Link
+            <span
               key={item}
-              href="/history"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
+              ref={historyRef}
+              className={`px-2 py-1 rounded relative ${historyOpen ? "bg-gray-200" : ""} hover:bg-gray-200 cursor-pointer`}
+              onClick={() => setHistoryOpen(open => !open)}
             >
               {item}
-            </Link>
+              {historyOpen && (
+                <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-60">
+                  <Link
+                    href="/history?volume=1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Volume 1
+                  </Link>
+                  <Link
+                    href="/history?volume=2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Volume 2
+                  </Link>
+                </div>
+              )}
+            </span>
           ) : (
             <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
               {item}
