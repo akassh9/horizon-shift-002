@@ -1,119 +1,192 @@
-# Overview
-
-This web app simulates an interactive “terminal” interface for exploring speculative healthcare foresight scenarios in the year 2034. Built with **Next.js**, **React**, **Framer Motion**, and **Tailwind CSS**, it layers draggable windows containing text or images over a Mac-style menu bar. Users navigate between a **Help** flow and three core foresight scenarios—**Dr. Me**, **Profit Over Patient**, and **A ‘Whole’ New World**—each with its own detail and “How did this happen?” subpages populated by configurable headlines and images.
+## This Readme is created for LLM consumption and understandability. 
 
 ---
 
-# File Structure
+## 0. Top‑Level Fact Sheet *(key–value, no prose)*
 
-```
-/components
-  ├ DraggableWindow.tsx    — generic wrapper that makes any child element draggable and manages z-index  
-  ├ TextEditWindow.tsx     — main terminal UI: typing animation, option navigation, detail & happened modes  
-  ├ PreviewWindow.tsx      — simplified draggable window for displaying a single image with optional title  
-  └ MacMenuBar.tsx         — fixed top menu bar emulating macOS menus (“File”, “Help”, etc.)  
-
-/src/app
-  ├ globals.css            — global Tailwind setup and custom styles  
-  ├ layout.tsx             — root HTML layout, font imports, analytics  
-  ├ page.tsx               — entry point: orchestrates Help flow, TextEditWindow, and scenario windows  
-  └ history/page.tsx       — (placeholder) separate History page link in the menu  
-
-/public/images             — all static asset images used by PreviewWindow and scenario draggables  
-/styles/mac-window.css     — extra styling for “mac-window” class  
-
-README.md, next.config.ts, etc.
+```jsonc
+{
+  "frameworks": ["Next.js 15", "React 18", "TypeScript", "Tailwind CSS (v4)", "Framer Motion"],
+  "runtime": "Node 18 on Vercel",
+  "dragLib": "react-draggable",
+  "entry": "src/app/page.tsx",
+  "staticAssets": "public/images/**",
+  "fonts": ["Geist Sans", "Geist Mono"],
+  "contentCategories": ["health", "education", "entertainment (stub)"],
+  "mainInteractiveWindow": "components/TextEditWindow.tsx"
+}
 ```
 
 ---
 
-# High-Level User Flows
+## 1. Domain Data Schemas — `/data/**`
 
-### 1. Help Flow
-- On initial load, a draggable “Welcome User” window types out a disclaimer and prompts “Type yes to confirm.”
-- After typing “yes,” it transitions (via Framer Motion) to “Help Guide – Page 2,” which introduces the three content categories (Health, Education, Entertainment).
-- Selecting `File → Add → Health` in the MacMenuBar dismisses Help and boots the main `TextEditWindow` in the center.
+### 1.1 `ForesightContent` *(shared TS interface)*
 
-### 2. Scenario Selection
-- `TextEditWindow` performs a terminal-style typing animation for an intro text, then reveals three scenario options one by one.
-- Arrow keys move a highlighted cursor; Enter selects a scenario index (`onOptionSelect`), which informs `page.tsx` to display corresponding windows/images.
+```ts
+export interface ForesightContent {
+  introText: string                              // terminal splash before options
+  options: { file: string; description: string }[] // 3 (exact) scenario rows
+  detailTexts: string[]                          // long text per scenario (length = options.length)
+  detailHeaderTemplate: (file: string) => string // returns header block for detail page
+  happenedConfig: {                              // “How did this happen?” timeline per scenario
+    header: string
+    intro: string
+    options: string[]  // 5 rows (4 themes + “Return … Start”)
+  }[]
+}
+```
 
-### 3. Detail & “How did this happen?” Sub-pages
-- Selecting a scenario opens a detail text stream with two choices: “go back” or “how did this happen?”
-- Choosing “how did this happen?” enters *happened mode*: it types an intro for that scenario’s timeline and reveals theme options (e.g. “Wearable & Continuous-Monitoring Tech”).
-- Hovering or keyboard navigation over those themes triggers `onHappenedHover`, which the page uses to filter and show three related draggable images for that theme.
+### 1.2 Content Modules
 
-### 4. Window Display
-- In `page.tsx`, a static array `windows: WindowConfig[]` defines all possible draggable items (images & text) with keys, positions, sizes, and optional URLs (`linkMap`).
-- Based on `selectedOption`, `happenedMode`, and `hoveredHappened`, the code filters windows into `activeWindows` and renders each via a `<MotionWindow>` wrapper that handles Framer Motion entry/exit and z-index bring-to-front logic.
+```
+data/
+  healthContent.ts        // fully implemented
+  educationContent.ts     // fully implemented
+  entertainmentContent.ts // copy-paste placeholder (still health text)
+```
 
----
-
-# Core Components & Props
-
-### `DraggableWindow`
-- **Purpose**: Wraps any child element in a `react-draggable` container; tracks a global `zIndexCounter` and brings the window to front on drag or click.
-- **Key Props**:
-  - `id`: unique identifier, used for scrolling into view.
-  - `initialPos`: `{ x, y }` start coordinates.
-  - `initialZIndex`: optional override of stacking order.
-  - `width` / `height`: CSS dimensions.
-  - `className` / `style`: additional styling.
-
-### `TextEditWindow`
-- **Modes**:
-  1. **Intro mode**: types `introText`, then reveals options.
-  2. **Detail mode**: after Enter on an option, types one of three detailed descriptions, shows “go back” / “how did this happen?”
-  3. **Happened mode**: types scenario-specific timeline intro, shows theme options.
-- **State & Callbacks**:
-  - `onOptionSelect(index)`
-  - `onHappenedModeChange(boolean)`
-  - `onHappenedHover(index)`
-  - `onHappenedScenarioChange(index)`
-
-### `PreviewWindow`
-- Light wrapper around `DraggableWindow` for showing images with a draggable title bar. Rarely invoked in the core flow but available for standalone previews.
-
-### `MacMenuBar`
-- Renders a fixed top nav with Apple menu icon and items.
-- “File” menu toggles a dropdown with “Add → Health/Education/Entertainment” and “Reset”.
-- “Help” toggles the Help window.
-- “History” opens `/history` in a new tab.
+Each exports a `ForesightContent` object.  
+**Invariant**: array lengths and ordering are hard-wired assumptions inside `TextEditWindow`.
 
 ---
 
-# State Management & Data Flow in `page.tsx`
+## 2. Window & Image Registry — `windows[]` in `page.tsx`
 
-### 1. Help-related state
-- `showHelp`, `helpAnswer`, `page2Active`, `showWindows`
-- Controls which help page to render and when to switch to the main `TextEditWindow`.
+### 2.1 Shape
 
-### 2. Scenario state
-- `selectedOption`: index of Dr Me / Profit Over Patient / Enhancement
-- `happenedMode`: whether we’re viewing the “How did this happen?” sub-flow
-- `happenedScenario`: which of the three scenarios we’re in for timeline content
-- `hoveredHappened`: index of the current timeline theme being hovered or selected
+```ts
+type WindowConfig = {
+  key: string                         // unique id, also used in linkMap / reducers
+  pos: { x: number; y: number }       // absolute start coordinates
+  size: { width: number | 'auto'; height: number | 'auto' }
+  type: 'image' | 'text'
+  src?: string                        // for images
+  text?: string                       // for text blocks
+}
+```
 
-### 3. Window filtering logic
-- `optionWindows`: maps scenario index → array of window keys to display in detail mode.
-- `scenarioDraggables`: nested map for happened sub-flow, scenario index → theme index → image keys.
-- `activeWindows`: computed based on `happenedMode` and `hoveredHappened` or `selectedOption`, filters the master windows array.
+### 2.2 Lifetime
 
-### 4. Rendering
-- Help windows and the `TextEditWindow` are each wrapped in Framer Motion’s `<AnimatePresence>` with keyed `<motion.div>` to animate between states.
-- All draggable scenario windows use `<MotionWindow>` to animate their entrance and wire up bring-to-front behavior.
+- The global `windows` array is *static* — nothing is pushed/removed at runtime.
+- Filtering decides which configs flow into `<MotionWindow>` → `<DraggableWindow>`.
 
 ---
 
-# Tailoring This for LLMs
+## 3. State Orchestration — `src/app/page.tsx`
 
-- **Configuration Data**: Expose the arrays `windows`, `optionWindows`, and `scenarioDraggables` as JSON objects so the LLM can understand which keys map to which scenarios or themes.
-- **Component Summaries**: Provide the above high-level descriptions of each component’s responsibilities and props.
-- **State Diagrams**: Sketch out a simple table showing how user input (key presses or clicks) transitions between `showHelp`, `selectedOption`, `detailMode`, and `happenedMode`.
-- **Sample Interaction**:
-  1. User types “yes” → Help page transitions  
-  2. User selects `File → Add → Health` → `TextEditWindow` appears  
-  3. User presses ↓ ↓ Enter on “Profit Over Patient” → detail text streams, “how did this happen?” option appears  
-  4. User selects “how did this happen?” → timeline types, hovering “Crypto-Health Payments” shows three crypto images  
+### 3.1 React State Snapshot
+
+| Variable                   | Purpose | Values |
+|----------------------------|---------|--------|
+| `showHelp`                 | Help overlay gating | `boolean` |
+| `helpAnswer`               | Raw user text for “Type yes to confirm” | `string` |
+| `selectedCategory`         | Current content domain | `"health"` \| `"education"` \| `"entertainment"` \| `null` |
+| `selectedOption`           | Scenario index inside category | `-1` (none) to `2` |
+| `happenedMode`             | In timeline sub-page? | `boolean` |
+| `happenedScenario`         | Which scenario’s timeline | `0 … 2` |
+| `hoveredHappened`          | Hovered theme row inside timeline | `null … 4` |
+| `zCounter` / `helpZIndex`  | Bring-to-front bookkeeping | `number` |
+
+### 3.2 Derived Window Filters
+
+```ts
+// when NOT in happenedMode
+(active windows) =
+  if selectedCategory === 'education'
+       (selectedOption < 0) ? allEducationOptionKeys
+                            : educationOptionWindows[selectedOption]
+  else if selectedCategory === 'health'
+       (selectedOption < 0) ? allHealthWindowKeys
+                            : optionWindows[selectedOption]
+  else ...
+// when in happenedMode
+(active windows) =
+  didHover ? scenarioDraggables[happenedScenario][hoveredHappened] : []
+```
+
+Everything else (animations, bring-to-front) is visual; no additional business logic.
+
+---
+
+## 4. Component Contracts
+
+```
+components/
+  DraggableWindow.tsx   // z-index + react-draggable wrapper
+  MacMenuBar.tsx        // top bar, emits onAdd{Health,Education,Entertainment}
+  TextEditWindow.tsx    // terminal UI; owns keyboard flow & typing animations
+  PreviewWindow.tsx     // rarely used; just DraggableWindow + <Image/>
+```
+
+### 4.1 `TextEditWindow` Callback Matrix
+
+| Prop                        | Fires When | Payload |
+|-----------------------------|------------|---------|
+| `onOptionSelect(idx)`       | User presses **Enter** on scenario list | `0 … 2` |
+| `onHappenedModeChange(bool)`| Timeline page entered/exited | `true` \| `false` |
+| `onHappenedHover(idx|null)` | Hovered timeline theme row | `0 … 4` \| `null` |
+| `onHappenedScenarioChange(idx)` | Entering timeline view | `0 … 2` |
+
+---
+
+## 5. Extending the App *(step-by-step recipe)*
+
+> LLM, follow sequentially to add a **new content category** (e.g., `"climate"`).
+
+1. **Create data file**  
+   Add `data/climateContent.ts` exporting a complete `ForesightContent` with:
+   - 3 scenario rows
+   - 3 detail texts
+   - 3 timeline configs × 5 options each
+
+2. **Add draggables**  
+   Append new `WindowConfig` objects to global `windows[]`.  
+   Group them as:
+
+   ```ts
+   const climateOptionWindows: Record<number, string[]> = { 0: [...], 1: [...], 2: [...] }
+   const climateScenarioDraggables: Record<number, Record<number, string[]>> = { ... }
+   ```
+
+3. **Wire filters** in `page.tsx`  
+   - Extend `selectedCategory` union type  
+   - Add `allClimateWindowKeys`, and merge into relevant filter branches
+
+4. **Expose through menu**  
+   - In `MacMenuBar.tsx`, add a menu item and callback `onAddClimate`
+
+5. **(Optional)** update dynamic highlight maps for blue ring animations
+
+No other steps needed — animations and layout auto-adjust.
+
+---
+
+## 6. Dev & Build Commands
+
+```bash
+# install
+pnpm i           # or yarn install
+
+# local dev
+pnpm dev         # next dev
+
+# type-check & lint in CI
+pnpm typecheck && pnpm lint
+
+# prod build
+pnpm build && pnpm start
+```
+
+> Environment variables are **not** required; the app is fully static + client-side.
+
+---
+
+## 7. Known TODOs *(tagged for next LLM)*
+
+- `entertainmentContent.ts` still reuses **health** content → needs proper text.
+- Link maps sometimes refer to `*...4*` keys missing in `/public/images` — verify.
+- Z-index escalation inside `MotionWindow` ignores `zCounter`; `DraggableWindow` uses its own counter. Consider lifting it to React state.
+- No persistent storage — refresh kills interaction context.
 
 ---
