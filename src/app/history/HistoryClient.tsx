@@ -22,14 +22,14 @@ export default function HistoryClient() {
         className="mac-window bg-white text-black font-mono border border-gray-300 shadow-lg"
       >
         <div className="mac-titlebar bg-gray-100 border-b border-gray-300 flex items-center px-3 py-1">
-          <span className="mac-traffic traffic-red mr-2"></span>
-          <span className="mac-traffic traffic-yellow mr-2"></span>
-          <span className="mac-traffic traffic-green"></span>
+          <span className="mac-traffic traffic-red mr-2" />
+          <span className="mac-traffic traffic-yellow mr-2" />
+          <span className="mac-traffic traffic-green" />
           <span className="mac-title-text text-gray-700 ml-3 font-semibold">Horizon Shift</span>
           <span className="ml-auto text-sm text-gray-500">Volume {volume}</span>
         </div>
         <div className="p-4">
-          {/* Content inside the note, if any additional description is needed */}
+          {/* Optional additional content */}
         </div>
       </DraggableWindow>
       <div
