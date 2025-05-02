@@ -1,151 +1,191 @@
-This is a **source‑of‑truth README** written **for a coding‑LLM** (not primarily for humans).  
+**“LLM‑oriented README”** 
+---
+
+# 0 · Mission Statement (“Why does this repo exist?”)
+
+> Build an **interactive foresight terminal** simulating a 2040‑era “archive computer.”
+> Users explore speculative scenarios (Health / Education / Entertainment) inside draggable macOS‑style windows, toggle timelines (“How did this happen?”), and skim headline clippings dropped around the screen.
+> **Everything**—text animation, z‑index juggling, menu‑bar gating, headline reveal—is client‑side React; the server only ships static assets.
 
 ---
 
-## 0. Top‑Level Fact Sheet  *(key–value, no prose)*
+# 1 · Tech Fact Sheet (key‑value, copy‑pastable)
 
 ```jsonc
 {
-  "frameworks": ["Next.js 15", "React 18", "TypeScript", "Tailwind CSS (v4)", "Framer Motion"],
-  "runtime": "Node 18 on Vercel",
+  "frameworks": ["Next.js 15", "React 18", "TypeScript", "Tailwind CSS v4", "Framer Motion"],
+  "runtime": "Node 18 on Vercel (Edge‑runtime not required)",
   "dragLib": "react‑draggable",
-  "entry": "src/app/page.tsx",
-  "staticAssets": "public/images/**",
-  "fonts": ["Geist Sans", "Geist Mono"],
-  "contentCategories": ["health", "education", "entertainment (stub)"],
-  "mainInteractiveWindow": "components/TextEditWindow.tsx"
+  "entry": "src/app/page.tsx  // <Home/>",
+  "windowSkin": "styles/mac-window.css + mac‑menubar logic",
+  "stateAtoms": ["selectedCategory", "selectedOption", "happenedMode", "hoveredHappened"],
+  "contentSchemas": ["data/foresightContent.ts  // canonical interface"],
+  "fonts": ["Geist Sans", "Geist Mono"],
+  "staticImages": "public/images/**  // 300+ png/jpg/webp headline tiles",
+  "analytics": ["@vercel/analytics", "@vercel/speed-insights"]
 }
 ```
 
 ---
 
-## 1. Domain Data Schemas —— `/data/**`
+# 2 · Domain Model
 
-### 1.1 `ForesightContent`       *(shared TS interface)*
+### 2.1 `ForesightContent` (interface)
 
 ```ts
-export interface ForesightContent {
-  introText: string                              // terminal splash before options
-  options: { file: string; description: string }[] // 3 (exact) scenario rows
-  detailTexts: string[]                          // long text per scenario (length = options.length)
-  detailHeaderTemplate: (file: string) => string // returns header block for detail page
-  happenedConfig: {                              // “How did this happen?” timeline per scenario
-    header: string
-    intro: string
-    options: string[]  // 5 rows (4 themes + “Return … Start”)
-  }[]
+interface ForesightContent {
+  introText: string;                // typed line‑by‑line in the terminal
+  options: { file: string; description: string }[];    // 3 scenario rows
+  detailTexts: string[];            // 3 bodies (aligned to options[i])
+  detailHeaderTemplate(file: string): string;          // top banner
+  happenedConfig: {                 // “How did this happen?” pane
+    header: string;
+    intro: string;
+    options: string[];              // timeline bullet list (length ≥4 + “Return”)
+  }[];
 }
 ```
 
-### 1.2 Content modules
+Concrete instances:
 
-```
-data/
-  healthContent.ts        // fully implemented
-  educationContent.ts     // fully implemented
-  entertainmentContent.ts // copy‑paste placeholder (still health text)
-```
+* **healthContent.ts**
+* **educationContent.ts**
+* **entertainmentContent.ts**
 
-Each exports `ForesightContent` populated for that category.  
-**Invariant**: array lengths and ordering are hard‑wired assumptions inside `TextEditWindow`.
+Each file is pure data; there is **no logic** outside of `detailHeaderTemplate`.
 
 ---
 
-## 2. Window & Image Registry —— `windows[]` in `page.tsx`
+# 3 · Component Primer
 
-### 2.1 Shape
+| Component             | Purpose                                                                                                 | Key Props / State                                              | Hotspots                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **`DraggableWindow`** | Generic window wrapper; handles z‑index bump and drag.                                                  | `id`, `initialPos`, `width/height`, `initialZIndex`            | Bumps global `zIndexCounter` in `bringToFront`.                                         |
+| **`TextEditWindow`**  | The “terminal” that types text, reveals options, handles keyboard nav, *detail* & *happened* sub‑modes. | `content: ForesightContent`, callbacks for option + hover etc. | <kbd>useEffect</kbd> chain implements mini‑state‑machine. Keyboard listener lives here. |
+| **`PreviewWindow`**   | Tiny image viewer (filename as title). Used only for future work.                                       | `src`, `title`, etc.                                           | Thin wrapper around `DraggableWindow` + Next `<Image/>`.                                |
+| **`MacMenuBar`**      | Global menu ( File / Edit / … History / Help). Blocks items on `isHistoryPage`.                        | Callback props (`onAddHealth`, …).                             | Dropdown & submenu built without headless‑UI.                                           |
+| **`HistoryClient`**   | Dedicated `/history` CSR view; embeds Issuu doc in mobile “singlePage” mode.                            | Reads `?volume=`, keeps iframe dark.                           | Wrapped in `<Suspense>` per Next 15 rule.                                               |
+
+---
+
+# 4 · Page Orchestrators
+
+### 4.1 `src/app/page.tsx` (<Home/>)
+
+1. Renders **MacMenuBar**.
+2. Shows **Help** flow (two pages) until user types “yes”.
+3. After a category is added via File▸Add, spawns one **TextEditWindow**.
+4. Maintains the *entire* draggable layer (`windows: WindowConfig[]`).
+
+   * Filtering logic lives in **`activeWindows`** computed property.
+   * Highlight logic uses `educationOptionHighlights`, `entertainmentOptionHighlights`, etc.
+5. **linkMap** turns certain draggable keys into `<a>` wrappers → opens sources in new tab.
+
+### 4.2 `src/app/history/page.tsx`
+
+CSR‑only page. Requirements already met (Suspense + `dynamic = "force-dynamic"` optional).
+
+---
+
+# 5 · Global State (React, not Redux)
+
+| Variable           | File                       | Meaning                                              |
+| ------------------ | -------------------------- | ---------------------------------------------------- |
+| `selectedCategory` | page.tsx                   | `"health" \| "education" \| "entertainment" \| null` |
+| `selectedOption`   | page.tsx                   | Index 0‑2 inside current category; –1 before choice  |
+| `happenedMode`     | page.tsx + TextEditWindow  | Are we inside “How did this happen?” UI?             |
+| `hoveredHappened`  | page.tsx + TextEditWindow  | Which timeline bullet is highlighted (0‑n)           |
+| `happenedScenario` | page.tsx                   | Mirrors `selectedOption` when in happened mode       |
+| `zCounter`         | page.tsx + DraggableWindow | Global max z‑index; increment on any click           |
+
+No external store; state resets on hard reload.
+
+---
+
+# 6 · Window/Headline Registry
+
+* **`windows` array** (\~350 entries) lives in `src/app/page.tsx`.
+* Each entry:
 
 ```ts
-type WindowConfig = {
-  key: string                         // unique id, also used in linkMap / reducers
-  pos: { x: number; y: number }       // absolute start coordinates
-  size: { width: number|'auto'; height: number|'auto' }
-  type: 'image' | 'text'
-  src?: string                        // for images
-  text?: string                       // for text blocks
+{
+  key: "wearable1",                // unique id
+  pos: { x: 120, y: 953 },         // spawn coords
+  size: { width: 700, height: 115.94 },
+  type: "image" | "text",
+  src?: "/images/…",               // if image
+  text?: "string…"                 // if text
 }
 ```
 
-### 2.2 Lifetime
+* Filtering matrices:
 
-* The global `windows` array is *static* — nothing is pushed/removed at runtime.  
-* Filtering decides which configs flow into `<MotionWindow>` → `<DraggableWindow>`.
+```
+optionWindows              // Health main
+educationOptionWindows     // Education main
+entertainmentOptionWindows // Entertainment main
+
+scenarioDraggables         // Health “happened” mode
+educationScenarioDraggables
+entertainmentScenarioDraggables
+```
+
+All of the above are **pure look‑up tables**; logic never mutates them.
 
 ---
 
-## 3. State Orchestration —— `src/app/page.tsx`
+# 7 · Menu‑Bar Disabling Logic
 
-### 3.1 React state snapshot
+* On **/history** routes, `MacMenuBar` greys out everything except:
 
-| variable                   | purpose | values |
-|----------------------------|---------|--------|
-| `showHelp`                 | help overlay gating | boolean |
-| `helpAnswer`               | raw user text for “Type yes to confirm” | string |
-| `selectedCategory`         | current content domain | `"health" \| "education" \| "entertainment" \| null` |
-| `selectedOption`           | scenario index inside category | `‑1` (none) … `2` |
-| `happenedMode`             | in timeline sub‑page? | boolean |
-| `happenedScenario`         | which scenario’s timeline | `0 … 2` |
-| `hoveredHappened`          | hovered theme row inside timeline | `null … 4` |
-| `zCounter` / `helpZIndex`  | bring‑to‑front bookkeeping | ints |
+  * *Terminal 13.2* label (cosmetic)
+  * *History* menu (opens Issuu volumes)
 
-### 3.2 Derived window filters
-
-```ts
-// when NOT in happenedMode
-(active windows) =
-  if selectedCategory === 'education'
-       (selectedOption < 0) ? allEducationOptionKeys
-                            : educationOptionWindows[selectedOption]
-  else if selectedCategory === 'health'
-       (selectedOption < 0) ? allHealthWindowKeys
-                            : optionWindows[selectedOption]
-  else ...
-// when in happenedMode
-(active windows) =
-  didHover ? scenarioDraggables[happenedScenario][hoveredHappened] : []
-```
-
-Everything else (animations, bring‑to‑front) is visual; no other business logic.
+Implementation: compute `isHistoryPage` with `usePathname()`; apply `opacity‑50 cursor‑not‑allowed`.
 
 ---
 
-## 4. Component Contracts
+# 8 · Animation Contracts
 
-```
-components/
-  DraggableWindow.tsx   // z‑index + react‑draggable wrapper
-  MacMenuBar.tsx        // top bar, emits onAdd{Health,Education,Entertainment}
-  TextEditWindow.tsx    // terminal UI; owns keyboard flow & typing animations
-  PreviewWindow.tsx     // rarely used; just DraggableWindow + <Image/>
-```
+* **Intro typing**: `TextEditWindow` slices text every 18 ms until length reached.
+* **Option reveal**: each option appears every 200 ms.
+* **Detail / Happened text**: same 18 ms tick.
+* **Window enter/exit**: `<AnimatePresence>` + `motion.div` (opacity/y slide).
+* **Z‑index bump**: `onPointerDown` triggers `bringToFront`.
 
-### 4.1 `TextEditWindow` callback matrix
-
-| prop                     | fires when | payload |
-|--------------------------|-----------|---------|
-| `onOptionSelect(idx)`            | user presses **Enter** on scenario list | 0 … 2 |
-| `onHappenedModeChange(bool)`     | timeline page entered / exited | true/false |
-| `onHappenedHover(idx \| null)`   | hovered timeline theme row | 0 … 4 \| null |
-| `onHappenedScenarioChange(idx)`  | entering timeline, tells parent which scenario | 0 … 2 |
+All timings are hard‑coded constants; feel free to expose as props if needed.
 
 ---
 
-## 5. Dev & Build Commands
+# 9 · Glossary (“You’ll see these words in code comments”)
+
+| Term                        | Meaning                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| **Happened mode**           | Timeline sub‑view reached from “How did this happen?”                          |
+| **Return option**           | Last bullet in every `happenedConfig.options`; pops back to main scenario list |
+| **Headline Draggables**     | Image tiles that surface when hovering timeline bullets                        |
+| **Option Highlight**        | Blue outline applied to selected scenario’s companion text draggables          |
+| **Help flow / Page 1 vs 2** | Intro waiver → confirm “yes” → category instructions                           |
+
+---
+
+# 10 · Runbook
 
 ```bash
-# install
-pnpm i           # or yarn install
+# Install
+brew install yarn           # if yarn missing
+yarn                         # or: corepack enable && pnpm i
 
-# local dev
-pnpm dev         # next dev
+# Develop
+yarn dev                     # http://localhost:3000
 
-# type‑check & lint in CI
-pnpm typecheck && pnpm lint
+# Lint / type‑check
+next lint && tsc --noEmit
 
-# prod build
-pnpm build && pnpm start
+# Build / preview
+yarn build && yarn start
 ```
 
-Environment variables are **not** required; app is 100 % static + client state.
+Vercel deploy works out of the box (no environment vars).
 
 ---

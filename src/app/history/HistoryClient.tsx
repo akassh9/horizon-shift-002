@@ -3,6 +3,7 @@
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import { DraggableWindow } from "../../../components/DraggableWindow";
+import { MacMenuBar } from "../../../components/MacMenuBar";
 
 export default function HistoryClient() {
   const searchParams = useSearchParams();
@@ -14,6 +15,9 @@ export default function HistoryClient() {
 
   return (
     <>
+      <div>
+        <MacMenuBar />
+      </div>
       <DraggableWindow
         id="history-note"
         initialPos={{ x: 250, y: 169 }}
@@ -25,11 +29,10 @@ export default function HistoryClient() {
           <span className="mac-traffic traffic-red mr-2" />
           <span className="mac-traffic traffic-yellow mr-2" />
           <span className="mac-traffic traffic-green" />
-          <span className="mac-title-text text-gray-700 ml-3 font-semibold">Horizon Shift</span>
-          <span className="ml-auto text-sm text-gray-500">Volume {volume}</span>
+          <span className="mac-title-text text-gray-700 ml-3 font-semibold"> Horizon Shift</span>
         </div>
         <div className="p-4">
-          {/* Optional additional content */}
+          <p className="text-sm text-gray-700">Volume {volume}</p>
         </div>
       </DraggableWindow>
       <div

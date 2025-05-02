@@ -1,13 +1,14 @@
-// components/MacMenuBar.tsx
 "use client";
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type MacMenuBarProps = {
   onAddHealth?: () => void;
   onAddEducation?: () => void;
   onAddEntertainment?: () => void;
   disableFile?: boolean;
+  disableAll?: boolean;
 };
 
 export const MacMenuBar: React.FC<MacMenuBarProps> = ({
@@ -15,11 +16,15 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
   onAddEducation,
   onAddEntertainment,
   disableFile,
+  disableAll,
 }) => {
   const [fileOpen, setFileOpen] = useState(false);
   const fileRef = useRef<HTMLSpanElement>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const historyRef = useRef<HTMLSpanElement>(null);
+
+  const pathname = usePathname();
+  const isHistoryPage = pathname.startsWith("/history");
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -67,8 +72,22 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
     >
       <span className="mr-6 text-lg"></span>
       <nav className="flex space-x-6 text-base font-medium relative">
-        {["Terminal 13.2", "File", "Edit", "Format", "View", "History", "Help"].map((item) =>
-          item === "File" ? (
+        {["Terminal 13.2", "File", "Edit", "Format", "View", "History", "Help"].map((item) => {
+          const disabled = disableAll 
+            || (isHistoryPage && item !== "Terminal 13.2" && item !== "History");
+
+          if (disabled) {
+            return (
+              <span
+                key={item}
+                className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
+              >
+                {item}
+              </span>
+            );
+          }
+
+          return item === "File" ? (
             <span
               key={item}
               ref={fileRef}
@@ -123,13 +142,6 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                 </div>
               )}
             </span>
-          ) : item === "Help" ? (
-            <span
-              key={item}
-              className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
-            >
-              {item}
-            </span>
           ) : item === "History" ? (
             <span
               key={item}
@@ -163,8 +175,8 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
             <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
               {item}
             </span>
-          )
-        )}
+          );
+        })}
       </nav>
     </div>
   );
