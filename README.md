@@ -1,14 +1,14 @@
-## This Readme is created for LLM consumption and understandability. 
+This is a **source‑of‑truth README** written **for a coding‑LLM** (not primarily for humans).  
 
 ---
 
-## 0. Top‑Level Fact Sheet *(key–value, no prose)*
+## 0. Top‑Level Fact Sheet  *(key–value, no prose)*
 
 ```jsonc
 {
-  "frameworks": ["Next.js 15", "React 18", "TypeScript", "Tailwind CSS (v4)", "Framer Motion"],
-  "runtime": "Node 18 on Vercel",
-  "dragLib": "react-draggable",
+  "frameworks": ["Next.js 15", "React 18", "TypeScript", "Tailwind CSS (v4)", "Framer Motion"],
+  "runtime": "Node 18 on Vercel",
+  "dragLib": "react‑draggable",
   "entry": "src/app/page.tsx",
   "staticAssets": "public/images/**",
   "fonts": ["Geist Sans", "Geist Mono"],
@@ -19,9 +19,9 @@
 
 ---
 
-## 1. Domain Data Schemas — `/data/**`
+## 1. Domain Data Schemas —— `/data/**`
 
-### 1.1 `ForesightContent` *(shared TS interface)*
+### 1.1 `ForesightContent`       *(shared TS interface)*
 
 ```ts
 export interface ForesightContent {
@@ -32,26 +32,26 @@ export interface ForesightContent {
   happenedConfig: {                              // “How did this happen?” timeline per scenario
     header: string
     intro: string
-    options: string[]  // 5 rows (4 themes + “Return … Start”)
+    options: string[]  // 5 rows (4 themes + “Return … Start”)
   }[]
 }
 ```
 
-### 1.2 Content Modules
+### 1.2 Content modules
 
 ```
 data/
   healthContent.ts        // fully implemented
   educationContent.ts     // fully implemented
-  entertainmentContent.ts // copy-paste placeholder (still health text)
+  entertainmentContent.ts // copy‑paste placeholder (still health text)
 ```
 
-Each exports a `ForesightContent` object.  
-**Invariant**: array lengths and ordering are hard-wired assumptions inside `TextEditWindow`.
+Each exports `ForesightContent` populated for that category.  
+**Invariant**: array lengths and ordering are hard‑wired assumptions inside `TextEditWindow`.
 
 ---
 
-## 2. Window & Image Registry — `windows[]` in `page.tsx`
+## 2. Window & Image Registry —— `windows[]` in `page.tsx`
 
 ### 2.1 Shape
 
@@ -59,7 +59,7 @@ Each exports a `ForesightContent` object.
 type WindowConfig = {
   key: string                         // unique id, also used in linkMap / reducers
   pos: { x: number; y: number }       // absolute start coordinates
-  size: { width: number | 'auto'; height: number | 'auto' }
+  size: { width: number|'auto'; height: number|'auto' }
   type: 'image' | 'text'
   src?: string                        // for images
   text?: string                       // for text blocks
@@ -68,27 +68,27 @@ type WindowConfig = {
 
 ### 2.2 Lifetime
 
-- The global `windows` array is *static* — nothing is pushed/removed at runtime.
-- Filtering decides which configs flow into `<MotionWindow>` → `<DraggableWindow>`.
+* The global `windows` array is *static* — nothing is pushed/removed at runtime.  
+* Filtering decides which configs flow into `<MotionWindow>` → `<DraggableWindow>`.
 
 ---
 
-## 3. State Orchestration — `src/app/page.tsx`
+## 3. State Orchestration —— `src/app/page.tsx`
 
-### 3.1 React State Snapshot
+### 3.1 React state snapshot
 
-| Variable                   | Purpose | Values |
+| variable                   | purpose | values |
 |----------------------------|---------|--------|
-| `showHelp`                 | Help overlay gating | `boolean` |
-| `helpAnswer`               | Raw user text for “Type yes to confirm” | `string` |
-| `selectedCategory`         | Current content domain | `"health"` \| `"education"` \| `"entertainment"` \| `null` |
-| `selectedOption`           | Scenario index inside category | `-1` (none) to `2` |
-| `happenedMode`             | In timeline sub-page? | `boolean` |
-| `happenedScenario`         | Which scenario’s timeline | `0 … 2` |
-| `hoveredHappened`          | Hovered theme row inside timeline | `null … 4` |
-| `zCounter` / `helpZIndex`  | Bring-to-front bookkeeping | `number` |
+| `showHelp`                 | help overlay gating | boolean |
+| `helpAnswer`               | raw user text for “Type yes to confirm” | string |
+| `selectedCategory`         | current content domain | `"health" \| "education" \| "entertainment" \| null` |
+| `selectedOption`           | scenario index inside category | `‑1` (none) … `2` |
+| `happenedMode`             | in timeline sub‑page? | boolean |
+| `happenedScenario`         | which scenario’s timeline | `0 … 2` |
+| `hoveredHappened`          | hovered theme row inside timeline | `null … 4` |
+| `zCounter` / `helpZIndex`  | bring‑to‑front bookkeeping | ints |
 
-### 3.2 Derived Window Filters
+### 3.2 Derived window filters
 
 ```ts
 // when NOT in happenedMode
@@ -105,7 +105,7 @@ type WindowConfig = {
   didHover ? scenarioDraggables[happenedScenario][hoveredHappened] : []
 ```
 
-Everything else (animations, bring-to-front) is visual; no additional business logic.
+Everything else (animations, bring‑to‑front) is visual; no other business logic.
 
 ---
 
@@ -113,56 +113,24 @@ Everything else (animations, bring-to-front) is visual; no additional business l
 
 ```
 components/
-  DraggableWindow.tsx   // z-index + react-draggable wrapper
+  DraggableWindow.tsx   // z‑index + react‑draggable wrapper
   MacMenuBar.tsx        // top bar, emits onAdd{Health,Education,Entertainment}
   TextEditWindow.tsx    // terminal UI; owns keyboard flow & typing animations
   PreviewWindow.tsx     // rarely used; just DraggableWindow + <Image/>
 ```
 
-### 4.1 `TextEditWindow` Callback Matrix
+### 4.1 `TextEditWindow` callback matrix
 
-| Prop                        | Fires When | Payload |
-|-----------------------------|------------|---------|
-| `onOptionSelect(idx)`       | User presses **Enter** on scenario list | `0 … 2` |
-| `onHappenedModeChange(bool)`| Timeline page entered/exited | `true` \| `false` |
-| `onHappenedHover(idx|null)` | Hovered timeline theme row | `0 … 4` \| `null` |
-| `onHappenedScenarioChange(idx)` | Entering timeline view | `0 … 2` |
-
----
-
-## 5. Extending the App *(step-by-step recipe)*
-
-> LLM, follow sequentially to add a **new content category** (e.g., `"climate"`).
-
-1. **Create data file**  
-   Add `data/climateContent.ts` exporting a complete `ForesightContent` with:
-   - 3 scenario rows
-   - 3 detail texts
-   - 3 timeline configs × 5 options each
-
-2. **Add draggables**  
-   Append new `WindowConfig` objects to global `windows[]`.  
-   Group them as:
-
-   ```ts
-   const climateOptionWindows: Record<number, string[]> = { 0: [...], 1: [...], 2: [...] }
-   const climateScenarioDraggables: Record<number, Record<number, string[]>> = { ... }
-   ```
-
-3. **Wire filters** in `page.tsx`  
-   - Extend `selectedCategory` union type  
-   - Add `allClimateWindowKeys`, and merge into relevant filter branches
-
-4. **Expose through menu**  
-   - In `MacMenuBar.tsx`, add a menu item and callback `onAddClimate`
-
-5. **(Optional)** update dynamic highlight maps for blue ring animations
-
-No other steps needed — animations and layout auto-adjust.
+| prop                     | fires when | payload |
+|--------------------------|-----------|---------|
+| `onOptionSelect(idx)`            | user presses **Enter** on scenario list | 0 … 2 |
+| `onHappenedModeChange(bool)`     | timeline page entered / exited | true/false |
+| `onHappenedHover(idx \| null)`   | hovered timeline theme row | 0 … 4 \| null |
+| `onHappenedScenarioChange(idx)`  | entering timeline, tells parent which scenario | 0 … 2 |
 
 ---
 
-## 6. Dev & Build Commands
+## 5. Dev & Build Commands
 
 ```bash
 # install
@@ -171,22 +139,13 @@ pnpm i           # or yarn install
 # local dev
 pnpm dev         # next dev
 
-# type-check & lint in CI
+# type‑check & lint in CI
 pnpm typecheck && pnpm lint
 
 # prod build
 pnpm build && pnpm start
 ```
 
-> Environment variables are **not** required; the app is fully static + client-side.
-
----
-
-## 7. Known TODOs *(tagged for next LLM)*
-
-- `entertainmentContent.ts` still reuses **health** content → needs proper text.
-- Link maps sometimes refer to `*...4*` keys missing in `/public/images` — verify.
-- Z-index escalation inside `MotionWindow` ignores `zCounter`; `DraggableWindow` uses its own counter. Consider lifting it to React state.
-- No persistent storage — refresh kills interaction context.
+Environment variables are **not** required; app is 100 % static + client state.
 
 ---
