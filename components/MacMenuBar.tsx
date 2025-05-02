@@ -5,12 +5,17 @@ import Link from "next/link";
 
 type MacMenuBarProps = {
   onAddHealth?: () => void;
-  onHelp?: () => void;
+  onAddEducation?: () => void;
+  onAddEntertainment?: () => void;
   disableFile?: boolean;
-  disableHelp?: boolean;
 };
 
-export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, disableFile, disableHelp }) => {
+export const MacMenuBar: React.FC<MacMenuBarProps> = ({
+  onAddHealth,
+  onAddEducation,
+  onAddEntertainment,
+  disableFile,
+}) => {
   const [fileOpen, setFileOpen] = useState(false);
   const fileRef = useRef<HTMLSpanElement>(null);
 
@@ -72,8 +77,24 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, dis
                       >
                         Health
                       </div>
-                      <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer">Education</div>
-                      <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer">Entertainment</div>
+                      <div
+                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          console.log("Education clicked");
+                          onAddEducation?.();
+                        }}
+                      >
+                        Education
+                      </div>
+                      <div
+                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          console.log("Entertainment clicked");
+                          onAddEntertainment?.();
+                        }}
+                      >
+                        Entertainment
+                      </div>
                     </div>
                   </div>
                   <div
@@ -88,8 +109,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({ onAddHealth, onHelp, dis
           ) : item === "Help" ? (
             <span
               key={item}
-              className={`px-2 py-1 rounded ${disableHelp ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 cursor-pointer"}`}
-              onClick={() => { if (!disableHelp) onHelp?.(); }}
+              className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
             >
               {item}
             </span>

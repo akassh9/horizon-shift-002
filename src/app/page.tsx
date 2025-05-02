@@ -6,6 +6,9 @@ import { DraggableWindow } from '../../components/DraggableWindow';
 import { MacMenuBar } from '../../components/MacMenuBar';
 import Image from 'next/image';
 import { AnimatePresence, motion } from "framer-motion";
+import { healthContent } from "../../data/healthContent";
+import { educationContent } from "../../data/educationContent";
+import { entertainmentContent } from "../../data/entertainmentContent";
 
 // Window configuration type and data
 type WindowConfig = {
@@ -472,6 +475,439 @@ const windows: WindowConfig[] = [
     type: "image",
     src: "/images/ethics3.png",
   },
+  {
+    key: "ide1",
+    pos: { x: 208, y: 115 },
+    size: { width: 210, height: 300.5 },
+    type: "image",
+    src: "/images/ide1.jpg",
+  },
+  {
+    key: "ide1-text",
+    pos: { x: 34, y: 113 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Ideological Teacher Exodus.",
+  },
+  {
+    key: "ide2",
+    pos: { x: -15, y: 720 },
+    size: { width: 300, height: 200.8 },
+    type: "image",
+    src: "/images/ide2.png",
+  },
+  {
+    key: "ide2-text",
+    pos: { x: 81, y: 909 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "A Menu of Independent Schools",
+  },
+  {
+    key: "ide3",
+    pos: { x: 1843, y: 353 },
+    size: { width: 300, height: 199.69 },
+    type: "image",
+    src: "/images/ide3.jpg",
+  },
+  {
+    key: "ide3-text",
+    pos: { x: 1834, y: 549 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Responses to Grading Bias",
+  },
+  {
+    key: "ide4",
+    pos: { x: 976, y: 863 },
+    size: { width: 400, height: 225.6 },
+    type: "image",
+    src: "/images/ide4.webp",
+  },
+  {
+    key: "ide4-text",
+    pos: { x: 1208, y: 893 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Schoolboards as political microenvironments",
+  },
+  {
+    key: "arms1",
+    pos: { x: 630, y: 37 },
+    size: { width: 210, height: 198.1 },
+    type: "image",
+    src: "/images/arms1.png",
+  },
+  {
+    key: "arms1-text",
+    pos: { x: 734, y: 210 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Timing it Right",
+  },
+  {
+    key: "arms2-text",
+    pos: { x: 363, y: 774 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "padding trascripts.",
+  },
+  {
+    key: "arms2",
+    pos: { x: 499, y: 690 },
+    size: { width: 210, height: 286 },
+    type: "image",
+    src: "/images/arms2.png",
+  },
+  {
+    key: "arms3",
+    pos: { x: 1109, y: 84 },
+    size: { width: 300, height: 168 },
+    type: "image",
+    src: "/images/arms3.webp",
+  },
+  {
+    key: "arms3-text",
+    pos: { x: 938, y: 55 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Schools built around getting ahead.",
+  },
+  {
+    key: "arms4-text",
+    pos: { x: 1517, y: 550 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "pay to play.",
+  },
+  {
+    key: "arms4",
+    pos: { x: 1575, y: 454 },
+    size: { width: 210, height: 100.8 },
+    type: "image",
+    src: "/images/upload-0a849059-a350-456a-afae-bf23b038d673.webp",
+  },
+  {
+    key: "cliff1",
+    pos: { x: 1745, y: 58 },
+    size: { width: 350, height: 233.33 },
+    type: "image",
+    src: "/images/cliff1.webp",
+  },
+  {
+    key: "cliff1-text",
+    pos: { x: 1701, y: 234 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "apprenticeship.",
+  },
+  {
+    key: "cliff2",
+    pos: { x: 44, y: 492 },
+    size: { width: 350, height: 196.93 },
+    type: "image",
+    src: "/images/cliff2.jpg",
+  },
+  {
+    key: "cliff2-text",
+    pos: { x: 230, y: 473 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Diversyfying Offerings",
+  },
+  {
+    key: "cliff3",
+    pos: { x: 1893, y: 788 },
+    size: { width: 210, height: 316.6 },
+    type: "image",
+    src: "/images/cliff3.jpg",
+  },
+  {
+    key: "cliff3-text",
+    pos: { x: 1670, y: 919 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "International Student Revenue",
+  },
+  {
+    key: "cliff4",
+    pos: { x: 480, y: 279 },
+    size: { width: 210, height: 197 },
+    type: "image",
+    src: "/images/cliff4.png",
+  },
+  {
+    key: "cliff4-text",
+    pos: { x: 497, y: 451 },
+    size: { width: "auto", height: "auto" },
+    type: "text",
+    text: "Is there a point?",
+  },
+  //headlines education
+    //culture
+  {
+    key: "culture1",         
+    pos: { x: 120, y: 953 },       
+    size: { width: 700, height: 115.94 },
+    type: "image",
+    src: "/images/culture1.png",
+  },
+  {
+    key: "culture2",
+    pos: { x: 256, y: 161 },
+    size: { width: 700, height: 108.41 },
+    type: "image",
+    src: "/images/culture2.png",
+  },
+  {
+    key: "culture3",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 69 },
+    type: "image",
+    src: "/images/culture3.png",
+  },
+    //home
+  {
+    key: "home1",
+    pos: { x: 106, y: 150 },
+    size: { width: 400, height: 150 },
+    type: "image",
+    src: "/images/home1.png",
+  },
+  {
+    key: "home2",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 157.5 },
+    type: "image",
+    src: "/images/home2.png",
+  },
+  {
+    key: "home3",          
+    pos: { x: 83, y: 683 },      
+    size: { width: 550, height: 102.67 },
+    type: "image",
+    src: "/images/home3.png",
+  },
+    //censor
+  {
+    key: "censor1",
+    pos: { x: 1170, y: 59 },
+    size: { width: 700, height: 198.66 },
+    type: "image",
+    src: "/images/censor1.png",
+  },
+  {
+    key: "censor2",
+    pos: { x: 1285, y: 849 },
+    size: { width: 600, height: 205 },
+    type: "image",
+    src: "/images/censor2.png",
+  },
+  {
+    key: "censor3",          
+    pos: { x: 61, y: 601 },       
+    size: { width: 550, height: 99.91 },
+    type: "image",
+    src: "/images/censor3.png",
+  },
+    //values
+  {
+    key: "values1",
+    pos: { x: 1091, y: 848 },
+    size: { width: 700, height: 106.46 },
+    type: "image",
+    src: "/images/values1.png",
+  },
+  {
+    key: "values2",
+    pos: { x: 23, y: 101 },
+    size: { width: 600, height: 101 },
+    type: "image",
+    src: "/images/values2.png",
+  },
+  {
+    key:"values3",
+    pos: { x: 182, y: 939 },
+    size: { width: 800, height: 129 },
+    type: "image",
+    src: "/images/values3.png",
+  },
+    //redshirting
+  {
+    key:"red1",
+    pos: { x: 64, y: 126 },
+    size: { width: 550, height: 180 },
+    type: "image",
+    src: "/images/red1.png",
+  },
+  {
+    key:"red2",
+    pos: { x: 1153, y: 47 },
+    size: { width: 900, height: 221 },
+    type: "image",
+    src: "/images/red2.png",
+  },
+  {
+    key:"red3",
+    pos: { x: 546, y: 880 },
+    size: { width: 700, height: 93.33 },
+    type: "image",
+    src: "/images/red3.png",
+  },
+    //pay
+  {
+    key:"pay1",
+    pos: { x: 54, y: 879 },
+    size: { width: 600, height: 128 },
+    type: "image",
+    src: "/images/pay1.png",
+  },
+  {
+    key:"pay2",
+    pos: { x: 1256, y: 134 },
+    size: { width: 500, height: 102 },
+    type: "image",
+    src: "/images/pay2.png",
+  },
+  {
+    key:"pay3",
+    pos: { x: 91, y: 115 },
+    size: { width: 700, height: 125 },
+    type: "image",
+    src: "/images/pay3.png",
+  },
+    //cred
+  {
+    key:"cred1",
+    pos: { x: 1071, y: 880 },
+    size: { width: 700, height: 147 },
+    type: "image",
+    src: "/images/cred1.png",
+  },
+  {
+    key:"cred2",
+    pos: { x: 136, y: 377 },
+    size: { width: 500, height: 65.5 },
+    type: "image",
+    src: "/images/cred2.png",
+  },
+  {
+    key:"cred3",
+    pos: { x: 528, y: 154 },
+    size: { width: 650, height: 99 },
+    type: "image",
+    src: "/images/cred3.png",
+  },
+    //test
+  {
+    key:"test1",
+    pos: { x: 1272, y: 876 },
+    size: { width: 650, height: 166.25 },
+    type: "image",
+    src: "/images/test1.png",
+  },
+  {
+    key: "test2",
+    pos: { x: 178, y: 152 },
+    size: { width: 450, height: 210 },
+    type: "image",
+    src: "/images/test2.png",
+  },
+  {
+    key: "test3",
+    pos: { x: 123, y: 613 },
+    size: { width: 500, height: 167 },
+    type: "image",
+    src: "/images/test3.png",
+  },
+  //demographic
+  {
+    key: "demo1",
+    pos: { x: 1523, y: 138 },
+    size: { width: 500, height: 145 },
+    type: "image",
+    src: "/images/demo1.png",
+  },
+  {
+    key: "demo2",
+    pos: { x: 81, y: 151 },
+    size: { width: 500, height: 102 },
+    type: "image",
+    src: "/images/demo2.png",
+  },
+  {
+    key: "demo3",
+    pos: { x: 19, y: 587 },
+    size: { width: 650, height: 121.2 },
+    type: "image",
+    src: "/images/demo3.png",
+  },
+    //tuition
+  {
+    key: "tuition1",
+    pos: { x: 1147, y: 849 },
+    size: { width: 900, height: 211 },
+    type: "image",
+    src: "/images/tuition1.png",
+  },
+  {
+    key: "tuition2",
+    pos: { x: 250, y: 120 },
+    size: { width: 500, height: 98 },
+    type: "image",
+    src: "/images/tuition2.png",
+  },
+  {
+    key: "tuition3",
+    pos: { x: 49, y: 571 },
+    size: { width: 600, height: 121.5 },
+    type: "image",
+    src: "/images/tuition3.png",
+  },
+    //corp
+  {
+    key: "corp1",
+    pos: { x: 1605, y: 685 },
+    size: { width: 500, height: 195 },
+    type: "image",
+    src: "/images/corp1.png",
+  },
+  {
+    key: "corp2",
+    pos: { x: 287, y: 80 },
+    size: { width: 500, height: 89 },
+    type: "image",
+    src: "/images/corp2.png",
+  },
+  {
+    key: "corp3",
+    pos: { x: 58, y: 205 },
+    size: { width: 500, height: 772.73 },
+    type: "image",
+    src: "/images/corp3.jpeg",
+  },
+    //altfin
+  {
+    key: "altfin1",
+    pos: { x: 1575, y: 77 },
+    size: { width: 500, height: 141.67 },
+    type: "image",
+    src: "/images/altfin1.png",
+  },
+  {
+    key: "altfin2",
+    pos: { x: 114, y: 169 },
+    size: { width: 500, height: 68 },
+    type: "image",
+    src: "/images/altfin2.png",
+  },
+  {
+    key: "altfin3",
+    pos: { x: 91, y: 867 },
+    size: { width: 900, height: 167.81 },
+    type: "image",
+    src: "/images/altfin3.png",
+  },
 ];
 // --- hyperlinks for special draggables ---
 const linkMap: Record<string, string> = {
@@ -511,6 +947,43 @@ const linkMap: Record<string, string> = {
   ethics1:"https://www.who.int/news/item/12-07-2021-who-issues-new-recommendations-on-human-genome-editing-for-the-advancement-of-public-health?utm_source=chatgpt.com",
   ethics2:"https://www.fda.gov/media/182567/download?utm_source=chatgpt.com",
   ethics3:"https://www.theguardian.com/commentisfree/2025/apr/23/america-pro-natalism-women?utm_source=chatgpt.com",
+  culture1:"https://www.npr.org/2023/01/22/1150259944/florida-rejects-ap-class-african-american-studies?utm_source=chatgpt.com",
+  culture2:"https://apnews.com/article/race-and-ethnicity-racial-injustice-business-education-government-and-politics-905c354a805cec1785160cf21f04c7ec?utm_source=chatgpt.com",
+  culture3:"https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/?utm_source=chatgpt.com",
+  home1:"https://www.census.gov/library/stories/2021/03/homeschooling-on-the-rise-during-covid-19-pandemic.html?utm_source=chatgpt.com",
+  home2:"https://techcrunch.com/2022/06/13/prenda-raises-20m-led-by-776-to-build-tech-to-run-k-8-microschools/?utm_source=chatgpt.com",
+  home3:"https://www.washingtonpost.com/education/interactive/2023/homeschooling-growth-data-by-district/?utm_source=chatgpt.com",
+  censor1:"https://www.npr.org/2023/06/22/1183701813/facing-book-bans-and-restrictions-on-lessons-teachers-are-scared-and-self-censor?utm_source=chatgpt.com",
+  censor2:"https://pen.org/report/americas-censored-classrooms-2024/?utm_source=chatgpt.com",
+  censor3:"https://apnews.com/article/coronavirus-pandemic-science-business-health-education-40ac2a2ec38c893b7c7a8dd196ce8b29?utm_source=chatgpt.com",
+  values1:"https://apnews.com/article/education-arizona-doug-ducey-school-vouchers-7c5d7eb0498e5e7234d7eeb726027506?utm_source=chatgpt.com",
+  values2:"https://apnews.com/article/business-education-michigan-tennessee-charter-schools-d9154ad70858a080c0d567fa71a9de3b?utm_source=chatgpt.com",
+  values3:"https://apnews.com/article/a34be626074ef4d4ded987f841ff9aa8?utm_source=chatgpt.com",
+  red1:"https://www.washingtonpost.com/opinions/2023/07/10/christine-emba-masculinity-new-model/?utm_source=chatgpt.com",
+  red2:"https://apnews.com/article/f6a0c3a8f97f8d6cf616f201f68c04fe?utm_source=chatgpt.com",
+  red3:"https://apnews.com/article/b6c9017f603c00466b9e9908c5f2183a?utm_source=chatgpt.com",
+  pay1:"https://www.forbes.com/sites/ryancraig/2024/07/26/how-to-make-college-admissions-a-little-less-unequal/?utm_source=chatgpt.com",
+  pay2:"https://www.forbes.com/sites/frederickhess/2023/12/19/why-are-elite-colleges-enabling-this-dubious-racket/?utm_source=chatgpt.com",
+  pay3:"https://www.businessinsider.com/parents-pay-millions-college-counselor-harvard-ivy-league-acceptance-letter-2023-9?utm_source=chatgpt.com",
+  cred1:"https://www.insidehighered.com/news/admissions/traditional-age/2023/10/23/assessing-college-readiness-pandemic-generation?utm_source=chatgpt.com",
+  cred2:"https://www.insidehighered.com/news/quick-takes/2023/12/06/nearly-80-percent-grades-yale-were-last-year?utm_source=chatgpt.com",
+  cred3:"https://www.forbes.com/sites/brennanbarnard/2023/11/21/will-ai-be-reviewing-your-college-application/?utm_source=chatgpt.com",
+  test1:"https://newsroom.collegeboard.org/digital-sat-launches-across-country-completing-transition-digital-and-providing-simpler-testing?utm_source=chatgpt.com",
+  test2:"https://www.marketwatch.com/press-release/test-preparation-market-to-grow-by-usd-16-28-billion-from-2024-2028-driven-by-online-test-prep-emphasis-with-ai-driving-market-transformation-technavio-bc92fbc8?utm_source=chatgpt.com",
+  test3:"https://www.freethink.com/consumer-tech/khanmigo-ai-tutor?utm_source=chatgpt.com",
+  demo1:"https://www.npr.org/2025/01/08/nx-s1-5246200/demographic-cliff-fewer-college-students-mean-fewer-graduates?utm_source=chatgpt.com",
+  demo2:"https://apnews.com/article/d4851555bd0fb360a92dee84a2d93140?utm_source=chatgpt.com",
+  demo3:"https://www.insidehighered.com/news/business/financial-health/2023/12/21/look-back-college-closures-and-mergers-2023?utm_source=chatgpt.com",
+  tuition1:"https://www.insidehighered.com/news/business/revenue-strategies/2023/09/15/amid-skepticism-colleges-value-tuition-resets-keep?utm_source=chatgpt.com",
+  tuition2:"https://www.forbes.com/sites/michaeltnietzel/2023/11/06/small-colleges-turning-to-these-tuition-deals-to-boost-enrollment/?utm_source=chatgpt.com",
+  tuition3:"https://www.forbes.com/sites/michaeltnietzel/2024/12/20/as-competition-heats-up-more-colleges-freeze-tuition-or-make-it-free/?utm_source=chatgpt.com",
+  corp1:"https://www.aboutamazon.com/news/workplace/career-choice-free-education-for-amazon-employees?utm_source=chatgpt.com",
+  corp2:"https://fortune.com/education/articles/a-tipping-point-for-higher-ed-google-launches-new-low-cost-online-programs-for-high-demand-jobs/?utm_source=chatgpt.com",
+  corp3:"https://www.linkedin.com/posts/palantir-technologies_skip-the-debt-skip-the-indoctrination-get-activity-7316432877577986049-gNjy/",
+  altfin1:"https://www.insidehighered.com/news/students/financial-aid/2024/02/06/critics-colleges-disagree-equity-differential-tuition?utm_source=chatgpt.com",
+  altfin2:"https://www.latimes.com/opinion/story/2024-04-30/college-tuition-costs-major-student-loans?utm_source=chatgpt.com",
+  altfin3:"https://www.insidehighered.com/news/2022/06/23/purdue-pauses-new-income-share-agreement-enrollments?utm_source=chatgpt.com",
+
 };
 
 // Renderer component for each window
@@ -582,7 +1055,6 @@ function MotionWindow({
 
 export default function Home() {
   const [showHelp, setShowHelp] = useState(true);
-  const [showWindows, setShowWindows] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number>(-1);
   const [happenedMode, setHappenedMode] = useState(false);
   const [hoveredHappened, setHoveredHappened] = useState<number | null>(null);
@@ -593,6 +1065,7 @@ export default function Home() {
   const [helpZIndex, setHelpZIndex] = useState(zCounter + 1);
   // State for the current happened scenario
   const [happenedScenario, setHappenedScenario] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
   useEffect(() => {
     function updateCenter() {
       const width = 600; // width of page2 window
@@ -636,22 +1109,9 @@ To load a category, hover over the File menu, select Add, then choose your desir
   const [page2DisplayedText, setPage2DisplayedText] = useState("");
   const [page2TypingIdx, setPage2TypingIdx] = useState(0);
 
-  const loadedHelp = showHelp && showWindows;
+  const loadedHelp = showHelp && page2Active;
 
-  // Typing effect for loadedHelp content
-  const loadedIntroText = `Data from wearables and an increase in holistic wellness options are promising for patient empowerment, but they exist amidst the tension of health systems being forced to optimize for efficiency, often at the cost of personalized care or attention to chronic conditions without a textbook diagnosis.`;
-  const [loadedDisplayedText, setLoadedDisplayedText] = useState("");
-  const [loadedTypingIdx, setLoadedTypingIdx] = useState(0);
-
-  useEffect(() => {
-    if (loadedHelp && loadedTypingIdx < loadedIntroText.length) {
-      const timeout = setTimeout(() => {
-        setLoadedDisplayedText(loadedIntroText.slice(0, loadedTypingIdx + 1));
-        setLoadedTypingIdx(loadedTypingIdx + 1);
-      }, 15);
-      return () => clearTimeout(timeout);
-    }
-  }, [loadedTypingIdx, loadedHelp, loadedIntroText]);
+  // --- loadedIntroText/loadedDisplayedText removed, no longer needed for help flow ---
 
   useEffect(() => {
     if (showHelp && helpTypingIdx < helpIntroText.length) {
@@ -686,7 +1146,24 @@ To load a category, hover over the File menu, select Add, then choose your desir
   // Handler to be called from MacMenuBar
   const handleAddHealth = () => {
     setShowHelp(false);
-    setShowWindows(true);
+    setSelectedCategory("health");
+    setSelectedOption(-1);
+    setHappenedMode(false);
+    setHoveredHappened(null);
+  };
+  const handleAddEducation = () => {
+    setShowHelp(false);
+    setSelectedCategory("education");
+    setSelectedOption(-1);
+    setHappenedMode(false);
+    setHoveredHappened(null);
+  };
+  const handleAddEntertainment = () => {
+    setShowHelp(false);
+    setSelectedCategory("entertainment");
+    setSelectedOption(-1);
+    setHappenedMode(false);
+    setHoveredHappened(null);
   };
 
   // Bring-to-front logic for windows (placeholder for real logic)
@@ -712,7 +1189,15 @@ To load a category, hover over the File menu, select Add, then choose your desir
     1: ['text6','text7','text8','text9', 'text10'],
     2: ['text11','humanoid-text','techlimbs-text','body-computer-text','aging-text'],
   };
-  const highlightedKeys = optionHighlights[selectedOption] || [];
+  // Highlights for Education scenario text draggables
+  const educationOptionHighlights: Record<number, string[]> = {
+    0: ["ide1-text", "ide2-text", "ide3-text", "ide4-text"],
+    1: ["arms1-text", "arms2-text", "arms3-text", "arms4-text"],
+    2: ["cliff1-text", "cliff2-text", "cliff3-text", "cliff4-text"],
+  };
+  const highlightedKeys = selectedCategory === "education"
+    ? (educationOptionHighlights[selectedOption] || [])
+    : (optionHighlights[selectedOption] || []);
 
   // Map option index to window keys to show
   const optionWindows: Record<number, string[]> = {
@@ -720,6 +1205,27 @@ To load a category, hover over the File menu, select Add, then choose your desir
     1: ['text6','text7','text8','text9', 'text10','pip','grocery','law','overreach','money'],
     2: ['text11','humanoid-text','techlimbs-text','body-computer-text','aging-text','celebrity','humanoid-img','techlimbs-img','body-computer-img','aging-img'],
   };
+
+  // for Education category
+  const educationOptionWindows: Record<number, string[]> = {
+    0: ["ide1", "ide1-text", "ide2", "ide2-text", "ide3", "ide3-text", "ide4", "ide4-text"],
+    1: [
+      "arms1", "arms1-text",
+      "arms2", "arms2-text",
+      "arms3", "arms3-text",
+      "arms4", "arms4-text"
+    ],
+    2: [
+      "cliff1",   "cliff1-text",
+      "cliff2",   "cliff2-text",
+      "cliff3",   "cliff3-text",
+      "cliff4",   "cliff4-text"
+    ],
+  };
+  // Flatten all education option keys to exclude them in other categories
+  const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
+  // Flatten all health option keys for initial display
+  const allHealthWindowKeys = Object.values(optionWindows).flat();
 
   // Draggables per happened-scenario and per option index
   const scenarioDraggables: Record<number, Record<number, string[]>> = {
@@ -749,6 +1255,31 @@ To load a category, hover over the File menu, select Add, then choose your desir
     },
   };
 
+  // Draggables per education scenario and per happened-option index
+  const educationScenarioDraggables: Record<number, Record<number, string[]>> = {
+    0: {
+      0: ["culture1", "culture2", "culture3", "culture4"],
+      1: ["home1", "home2", "home3", "home4"],
+      2: ["censor1", "censor2", "censor3", "censor4"],
+      3: ["values1", "values2", "values3", "values4"],
+      4: [],  // Return to Education Start
+    },
+    1: {
+      0: ["red1", "red2", "red3", "red4"],
+      1: ["pay1", "pay2", "pay3", "pay4"],
+      2: ["cred1", "cred2", "cred3", "cred4"],
+      3: ["test1", "test2", "test3", "test4"],
+      4: [],  // Return to Education Start
+    },
+    2: {
+      0: ["demo1", "demo2", "demo3", "demo4"],
+      1: ["tuition1", "tuition2", "tuition3", "tuition4"],
+      2: ["corp1", "corp2", "corp3", "corp4"],
+      3: ["altfin1", "altfin2", "altfin3", "altfin4"],
+      4: [],  // Return to Education Start
+    },
+  };
+
   // Flatten all scenario draggables into one list for filtering
   const allScenarioKeys = Object.values(scenarioDraggables)
     .flatMap(optMap => Object.values(optMap))
@@ -758,26 +1289,62 @@ To load a category, hover over the File menu, select Add, then choose your desir
 
   // Compute which draggables to show
   const activeWindows: WindowConfig[] = happenedMode
-    ? (
-        hoveredHappened !== null
-          ? windows.filter(w =>
-              scenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
-            )
-          : []
-      )
-    : (
-        selectedOption >= 0 && selectedOption in optionWindows
-          ? windows.filter(w => optionWindows[selectedOption].includes(w.key))
-          : windows.filter(w => !allScenarioKeys.includes(w.key))
-      );
+    ? (() => {
+        if (selectedCategory === "education") {
+          return hoveredHappened !== null
+            ? windows.filter(w =>
+                educationScenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
+              )
+            : [];
+        } else {
+          return hoveredHappened !== null
+            ? windows.filter(w =>
+                scenarioDraggables[happenedScenario][hoveredHappened!]?.includes(w.key)
+              )
+            : [];
+        }
+      })()
+    : (() => {
+        if (selectedCategory === "education") {
+          // Before any option is selected, show all education draggables
+          if (selectedOption < 0) {
+            return windows.filter(w =>
+              allEducationOptionKeys.includes(w.key)
+            );
+          }
+          // Once an option is selected, show only that option's draggables
+          return educationOptionWindows[selectedOption]
+            ? windows.filter(w =>
+                educationOptionWindows[selectedOption].includes(w.key)
+              )
+            : [];
+        } else if (selectedCategory === "health") {
+          // Health category
+          if (selectedOption >= 0 && selectedOption in optionWindows) {
+            return windows.filter(w =>
+              optionWindows[selectedOption].includes(w.key)
+            );
+          }
+          // before option selected, show all Health draggables
+          return windows.filter(w =>
+            allHealthWindowKeys.includes(w.key)
+          );
+        } else {
+          // other categories (e.g., entertainment)
+          return windows.filter(w =>
+            !allScenarioKeys.includes(w.key) &&
+            !allEducationOptionKeys.includes(w.key)
+          );
+        }
+      })();
 
   return (
     <>
       <MacMenuBar
         onAddHealth={handleAddHealth}
-        onHelp={() => setShowHelp(h => !h)}
+        onAddEducation={handleAddEducation}
+        onAddEntertainment={handleAddEntertainment}
         disableFile={!page2Active}
-        disableHelp={showHelp}
       />
       <AnimatePresence mode="wait" initial={false}>
         {loadedHelp ? (
@@ -803,12 +1370,12 @@ To load a category, hover over the File menu, select Add, then choose your desir
                   <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                 </div>
-                <h1 className="ml-3 text-lg font-semibold">Health Help</h1>
+                <h1 className="ml-3 text-lg font-semibold">Help Guide – Page 2</h1>
                 <span className="ml-auto text-sm text-gray-500">April 28, 2025 at 9:07 PM</span>
               </div>
               {/* Body */}
               <div className="px-4 py-3 font-mono whitespace-pre-wrap">
-                {loadedDisplayedText}
+                {page2DisplayedText}
               </div>
             </DraggableWindow>
           </motion.div>
@@ -871,19 +1438,36 @@ To load a category, hover over the File menu, select Add, then choose your desir
         ) : null}
       </AnimatePresence>
 
-      {showWindows && (
-        <TextEditWindow
-          initialPos={{ x: 694, y: 299 }}
-          initialZIndex={1}
-          onOptionSelect={setSelectedOption}
-          onHappenedModeChange={setHappenedMode}
-          onHappenedHover={setHoveredHappened}
-          onHappenedScenarioChange={setHappenedScenario}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {selectedCategory && (
+          <motion.div
+            key={`text-editor-${selectedCategory}`}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <TextEditWindow
+              content={
+                selectedCategory === "health"
+                  ? healthContent
+                  : selectedCategory === "education"
+                  ? educationContent
+                  : entertainmentContent
+              }
+              initialPos={{ x: 694, y: 299 }}
+              initialZIndex={1}
+              onOptionSelect={setSelectedOption}
+              onHappenedModeChange={setHappenedMode}
+              onHappenedHover={setHoveredHappened}
+              onHappenedScenarioChange={setHappenedScenario}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
-        {showWindows && activeWindows.map(cfg => (
+        {selectedCategory && activeWindows.map(cfg => (
           <MotionWindow
             key={cfg.key}
             cfg={cfg}
@@ -892,8 +1476,6 @@ To load a category, hover over the File menu, select Add, then choose your desir
           />
         ))}
       </AnimatePresence>
-
-      <button onClick={() => setShowWindows(true)}>Show Windows (Debug)</button>
     </>
   );
 }
