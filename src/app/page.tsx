@@ -10,6 +10,7 @@ import { healthContent } from "../../data/healthContent";
 import { educationContent } from "../../data/educationContent";
 import { entertainmentContent } from "../../data/entertainmentContent";
 
+
 // Window configuration type and data
 type WindowConfig = {
   key: string;
@@ -1509,6 +1510,36 @@ export default function Home() {
   const [happenedScenario, setHappenedScenario] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
 
+  useEffect(() => {
+    // Prefetch JS modules
+    import('../../data/healthContent');
+    import('../../data/educationContent');
+    import('../../data/entertainmentContent');
+
+    // Flatten keys for each category
+    const allHealthWindowKeys = Object.values(optionWindows).flat();
+    const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
+    const allEntertainmentOptionKeys = Object.values(entertainmentOptionWindows).flat();
+
+    const nonHappenedKeys = {
+      health: allHealthWindowKeys,
+      education: allEducationOptionKeys,
+      entertainment: allEntertainmentOptionKeys,
+    } as const;
+
+    // Preload images for each category
+    (['health','education','entertainment'] as const).forEach(cat => {
+      const keys = nonHappenedKeys[cat];
+      windows
+        .filter(w => w.type === 'image' && keys.includes(w.key))
+        .forEach(w => {
+          const img = new window.Image();
+          img.src = w.src!;
+        });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   // Determine if user has confirmed "yes"
   const page2Active = helpAnswer.trim().toLowerCase() === "yes";
 
@@ -1665,12 +1696,13 @@ To load a category, hover over the File menu, select Add, then choose your desir
     1: ["ai1", "ai1-text", "ai2", "ai2-text", "ai3", "ai3-text", "ai4", "ai4-text"],
     2: ["king1", "king1-text", "king2", "king2-text", "king3", "king3-text", "king4", "king4-text"],
   };
-  // Flatten all education option keys to exclude them in other categories
-  const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
-  // Flatten all entertainment option keys to exclude them in other categories
-  const allEntertainmentOptionKeys = Object.values(entertainmentOptionWindows).flat();
-  // Flatten all health option keys for initial display
+
+  // Flattened lists of window keys for each primary category
   const allHealthWindowKeys = Object.values(optionWindows).flat();
+  const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
+  const allEntertainmentOptionKeys = Object.values(entertainmentOptionWindows).flat();
+
+
 
   // Draggables per happened-scenario and per option index
   const scenarioDraggables: Record<number, Record<number, string[]>> = {
