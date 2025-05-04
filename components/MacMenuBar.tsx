@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type MacMenuBarProps = {
   onAddHealth?: () => void;
@@ -29,8 +29,42 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
   const [historyOpen, setHistoryOpen] = useState(false);
   const historyRef = useRef<HTMLSpanElement>(null);
 
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const isHistoryPage = pathname.startsWith("/history");
+
+  // -------- centralised URL helper --------
+  const router = useRouter();
+  const currentParams = useSearchParams();
+
+  /**
+   * Merge the provided key/value pairs into the query‑string.
+   * Use `undefined` to delete a key.  Uses shallow routing.
+   */
+  const navigate = (updates: Record<string, string | undefined>) => {
+    const params = new URLSearchParams(currentParams.toString());
+
+    Object.entries(updates).forEach(([k, v]) => {
+      if (v === undefined) params.delete(k);
+      else params.set(k, v);
+    });
+
+    const query = params.toString();
+    router.push(query ? `/?${query}` : "/", { scroll: false });
+  };
+  // ----------------------------------------
+
+  const addSector = (
+    sector: "health" | "education" | "entertainment",
+    cb?: () => void
+  ) => {
+    navigate({ sector, help: undefined });
+    cb?.();
+  };
+
+  const triggerHelp = () => {
+    navigate({ help: "yes", sector: undefined });
+    onHelp?.();
+  };
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -112,28 +146,19 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                     <div className="absolute left-full top-0 mt-0 ml-1 w-36 bg-white border border-gray-200 rounded shadow-lg py-1 z-70">
                       <div
                         className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                          console.log("Health clicked");
-                          onAddHealth?.();
-                        }}
+                        onClick={() => addSector("health", onAddHealth)}
                       >
                         Health
                       </div>
                       <div
                         className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                          console.log("Education clicked");
-                          onAddEducation?.();
-                        }}
+                        onClick={() => addSector("education", onAddEducation)}
                       >
                         Education
                       </div>
                       <div
                         className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                          console.log("Entertainment clicked");
-                          onAddEntertainment?.();
-                        }}
+                        onClick={() => addSector("entertainment", onAddEntertainment)}
                       >
                         Entertainment
                       </div>
@@ -200,7 +225,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
               <span
                 key="Help"
                 className="px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
-                onClick={onHelp}
+                onClick={triggerHelp}
               >
                 Help
               </span>

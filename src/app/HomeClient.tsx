@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { DraggableWindow } from '../../components/DraggableWindow';
 import { TextEditWindow } from '../../components/TextEditWindow';
 import { MacMenuBar } from '../../components/MacMenuBar';
@@ -211,9 +212,14 @@ export default function Home() {
   const [happenedScenario, setHappenedScenario] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
 
+  const router = useRouter();
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (!searchParams) {
+      return;
+    }
     const sector = searchParams.get("sector");
     const helpParam = searchParams.get("help");
 
@@ -623,6 +629,11 @@ To load a category, hover over the File menu, select Add, then choose your desir
   const handleHelpClick = () => {
     setShowHelp(true);
     setHelpAnswer("yes");
+    setSelectedCategory(null);
+    setSelectedOption(-1);
+    setHappenedMode(false);
+    setHoveredHappened(null);
+    router.push("/?help=yes");
   };
 
   return (
