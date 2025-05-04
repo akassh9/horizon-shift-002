@@ -4,7 +4,7 @@ import type { ForesightContent } from "./foresightContent";
 export const healthContent: ForesightContent = {
   introText: `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 CATEGORY LOADED: Health
-Date Retrieved: 14 May 2040 | 09:17:33 EST
+Date Retrieved: April 2, 2034
 ————————
 You may choose one of the following three health scenarios to explore further. Each scenario focuses on key developments reshaping healthcare in 2034.
 
@@ -48,7 +48,7 @@ Legal definitions of “human” lag behind the tech. Courts debate whether enha
   detailHeaderTemplate: (file) =>
     `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 └─ QUERY: "${file}"
-Date Retrieved: 14 May 2040 | 09:17:33 EST`,
+Date Retrieved: April 2, 2034`,
 
   happenedConfig: [
     {

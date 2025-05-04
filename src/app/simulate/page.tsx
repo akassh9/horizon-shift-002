@@ -6,20 +6,38 @@ import { SimulationWindow } from "../../../components/SimulationWindow";
 import { MacMenuBar } from "../../../components/MacMenuBar";
 
 const PROMPTS: Record<
-  Exclude<
-    "intro" | "job" | "age" | "marital" | "city" | "result",
-    "result"
-  >,
+  Exclude<"intro" | "job" | "age" | "marital" | "city" | "result", "result">,
   string
 > = {
-  intro:
-    'Welcome to Simulation Mode!\n\nWe\'ll generate a personalised "day in the life" based on your profile.',
-  job:
-    "What is your job? (From 2028 or choose from: Immersive Experience Architect, Personal Data Broker, Holistic Curriculum Curator, Augmented-Reality Venue Medic, Ethical AI Talent Agent)",
-  age: "What is your age? (Enter two digits)",
-  marital: "What is your marital status? (Single, Married, Divorced)",
-  city: "Which city will you be in?",
+  intro: [
+    "Welcome back to the world of 2034!",
+    "You’ve just stepped out of Extended Aging Freeze™ and this simulation will help you re-acclimate.",
+    "Let’s build your personalised “day in the life” profile."
+  ].join("\n\n"),
+
+  job: [
+    "First, what role will you assume in this new society?",
+    "(Either type your actual 2028 job title—or pick one of our upskilling-certified careers:)",
+    "• Immersive Experience Architect",
+    "• Personal Data Broker",
+    "• Holistic Curriculum Curator",
+    "• Augmented-Reality Venue Medic",
+    "• Ethical AI Talent Agent"
+  ].join("\n"),
+
+  age: "Next, how old are you now? (Please enter your current age in years)",
+
+  marital: [
+    "What’s your relationship status as you restart life in 2034?",
+    "(Select one: Single, Married, Divorced)"
+  ].join(" "),
+
+  city: [
+    "Finally, which city are you waking up in?",
+    "This will help ground your simulation in the right locale."
+  ].join(" ")
 };
+
 
 // ----------------------------------
 // Helper to fetch scenario text
@@ -208,7 +226,7 @@ export default function SimulatePage() {
         <SimulationWindow
           key={step}
           title="Simulation Mode"
-          date={new Date().toLocaleString()}
+          date="April 2, 2034"
           showCursor={step === "result"}
           size={{
             intro: { width: 720, height: 500 },

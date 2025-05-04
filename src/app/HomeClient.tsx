@@ -671,7 +671,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                 </div>
                 <h1 className="ml-3 text-lg font-semibold">Help Guide – Page 2</h1>
-                <span className="ml-auto text-sm text-gray-500">April 28, 2025 at 9:07 PM</span>
+                <span className="ml-auto text-sm text-gray-500">April 2, 2034</span>
               </div>
               <div className="px-4 py-3 mb-4 font-mono text-sm text-gray-800 bg-blue-50 border-l-4 border-blue-400 rounded-md italic shadow-sm">
                 Calibrate: Press <kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>+</kbd>/<kbd>-</kbd> to zoom in and out until this window is centered on your screen.
@@ -712,7 +712,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 {/* Title */}
                 <h1 className="ml-3 text-lg font-semibold">Welcome User</h1>
                 {/* Timestamp */}
-                <span className="ml-auto text-sm text-gray-500">April 2, 2034 at 8:24 PM</span>
+                <span className="ml-auto text-sm text-gray-500">April 2, 2034</span>
               </div>
               {helpAnswer.trim().toLowerCase() === "yes" ? (
                 <div className="px-4 py-3 font-mono whitespace-pre-wrap">

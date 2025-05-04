@@ -4,7 +4,7 @@ import type { ForesightContent } from "./foresightContent";
 export const educationContent: ForesightContent = {
   introText: `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 CATEGORY LOADED: Education
-Date Retrieved: 14 May 2040 | 09:17:33 EST
+Date Retrieved: April 2, 2034
 ————————
 You may choose one of the following three education scenarios to explore further. Each scenario spotlights forces now reshaping how—and why—we learn.
 
@@ -38,7 +38,7 @@ You may choose one of the following three education scenarios to explore further
   detailHeaderTemplate: (file) =>
     `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 └─ QUERY: "${file}"
-Date Retrieved: 14 May 2040 | 09:17:33 EST`,
+Date Retrieved: April 2, 2034`,
 
   /* ───────────────────────  “HOW DID THIS HAPPEN?” CONFIG  ─────────────────────── */
   happenedConfig: [

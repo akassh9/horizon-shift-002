@@ -5,7 +5,7 @@ export const entertainmentContent: ForesightContent = {
   /* ───────────────────────────────  INTRO  ─────────────────────────────── */
   introText: `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 CATEGORY LOADED: Entertainment
-Date Retrieved: 14 May 2040 | 09:17:33 EST
+Date Retrieved: April 2, 2034
 ————————
 You may choose one of the following three entertainment scenarios to explore further. Each scenario reveals how tech, culture, and fandom reshaped what it means to create—and consume—stories in 2034.
 
@@ -43,7 +43,7 @@ You may choose one of the following three entertainment scenarios to explore fur
   detailHeaderTemplate: (file) =>
     `[SYS-ARCHIVE v3.7]  •  NODE: CINCINNATI_EDU_NET
 └─ QUERY: "${file}"
-Date Retrieved: 14 May 2040 | 09:17:33 EST`,
+Date Retrieved: April 2, 2034`,
 
   /* ─────────────────────  “HOW DID THIS HAPPEN?” CONFIG  ───────────────────── */
   happenedConfig: [
