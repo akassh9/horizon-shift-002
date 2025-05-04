@@ -9,6 +9,9 @@ type MacMenuBarProps = {
   onAddEntertainment?: () => void;
   disableFile?: boolean;
   disableAll?: boolean;
+  onHelp?: () => void;
+  disableHelp?: boolean;
+  disableSimulate?: boolean;
 };
 
 export const MacMenuBar: React.FC<MacMenuBarProps> = ({
@@ -17,6 +20,9 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
   onAddEntertainment,
   disableFile,
   disableAll,
+  onHelp,
+  disableHelp,
+  disableSimulate,
 }) => {
   const [fileOpen, setFileOpen] = useState(false);
   const fileRef = useRef<HTMLSpanElement>(null);
@@ -72,7 +78,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
     >
       <span className="mr-6 text-lg"></span>
       <nav className="flex space-x-6 text-base font-medium relative">
-        {["Terminal 13.2", "File", "Edit", "Format", "View", "History", "Help"].map((item) => {
+        {["Terminal 13.2", "File", "Simulate", "History", "Help"].map((item) => {
           const disabled = disableAll 
             || (isHistoryPage && item !== "Terminal 13.2" && item !== "History");
 
@@ -133,15 +139,26 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                       </div>
                     </div>
                   </div>
-                  <div
-                    className={`px-4 py-1 ${disableFile ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 cursor-pointer"}`}
-                    onClick={() => { if (!disableFile) window.location.reload(); }}
-                  >
-                    Reset
-                  </div>
                 </div>
               )}
             </span>
+          ) : item === "Simulate" ? (
+            disableSimulate ? (
+              <span
+                key="Simulate"
+                className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
+              >
+                Simulate
+              </span>
+            ) : (
+              <Link
+                key="Simulate"
+                href="/simulate"
+                className="inline-flex items-center hover:bg-gray-200 px-2 py-1 rounded cursor-pointer"
+              >
+                Simulate
+              </Link>
+            )
           ) : item === "History" ? (
             <span
               key={item}
@@ -171,6 +188,23 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                 </div>
               )}
             </span>
+          ) : item === "Help" ? (
+            disableHelp ? (
+              <span
+                key="Help"
+                className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
+              >
+                Help
+              </span>
+            ) : (
+              <span
+                key="Help"
+                className="px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
+                onClick={onHelp}
+              >
+                Help
+              </span>
+            )
           ) : (
             <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
               {item}

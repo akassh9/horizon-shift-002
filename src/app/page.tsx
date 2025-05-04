@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { DraggableWindow } from '../../components/DraggableWindow';
 import { TextEditWindow } from '../../components/TextEditWindow';
 import { MacMenuBar } from '../../components/MacMenuBar';
@@ -210,6 +211,24 @@ export default function Home() {
   const [happenedScenario, setHappenedScenario] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
 
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const sector = searchParams.get("sector");
+    const helpParam = searchParams.get("help");
+
+    if (helpParam === "yes") {
+      handleHelpClick();
+    } else if (sector === "health") {
+      handleAddHealth();
+    } else if (sector === "education") {
+      handleAddEducation();
+    } else if (sector === "entertainment") {
+      handleAddEntertainment();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     // Prefetch JS modules
     import('../../data/healthContent');
@@ -242,6 +261,43 @@ export default function Home() {
   
   // Determine if user has confirmed "yes"
   const page2Active = helpAnswer.trim().toLowerCase() === "yes";
+
+  // Preload draggable images when user passes the initial help screen
+  useEffect(() => {
+    if (page2Active) {
+      const allDraggableKeys = [
+        ...allHealthWindowKeys,
+        ...allEducationOptionKeys,
+        ...allEntertainmentOptionKeys,
+      ];
+      windows
+        .filter(w => w.type === 'image' && allDraggableKeys.includes(w.key))
+        .forEach(w => {
+          const img = new window.Image();
+          img.src = w.src!;
+        });
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page2Active]);
+  
+  // Preload images for the current "happened" section once the user enters happened mode
+  useEffect(() => {
+    if (happenedMode && selectedCategory) {
+      let keysToPreload: string[] = [];
+      if (selectedCategory === "health") {
+        keysToPreload = Object.values(scenarioDraggables[happenedScenario] || {}).flat();
+      } else if (selectedCategory === "education") {
+        keysToPreload = Object.values(educationScenarioDraggables[happenedScenario] || {}).flat();
+      } else if (selectedCategory === "entertainment") {
+        keysToPreload = Object.values(entertainmentScenarioDraggables[happenedScenario] || {}).flat();
+      }
+      windows
+        .filter(w => w.type === "image" && keysToPreload.includes(w.key))
+        .forEach(w => {
+          const img = new window.Image();
+          img.src = w.src!;
+        });
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [happenedMode, selectedCategory, happenedScenario]);
 
   // Help intro typing effect
   const helpIntroText = `This resource has been developed by SIN Consulting Ltd. to help you adjust to everyday life in the year 2034.
@@ -563,6 +619,12 @@ To load a category, hover over the File menu, select Add, then choose your desir
         }
       })();
 
+  // Handler to open help page 2 directly
+  const handleHelpClick = () => {
+    setShowHelp(true);
+    setHelpAnswer("yes");
+  };
+
   return (
     <>
       <MacMenuBar
@@ -570,6 +632,8 @@ To load a category, hover over the File menu, select Add, then choose your desir
         onAddEducation={handleAddEducation}
         onAddEntertainment={handleAddEntertainment}
         disableFile={!page2Active}
+        onHelp={handleHelpClick}
+        disableHelp={showHelp}
       />
       <AnimatePresence mode="wait" initial={false}>
         {loadedHelp ? (
