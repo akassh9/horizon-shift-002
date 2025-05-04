@@ -7,6 +7,9 @@ import { MacMenuBar } from "../../../components/MacMenuBar";
 
 export default function HistoryClient() {
   const searchParams = useSearchParams();
+  if (!searchParams) {
+    return null;
+  }
   const volume = searchParams.get("volume") || "1";
   const iframeSrc =
     volume === "2"

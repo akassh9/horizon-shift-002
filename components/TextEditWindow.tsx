@@ -1,6 +1,6 @@
 "use client";
 import type { ForesightContent } from "../data/foresightContent";
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { ReactNode, useEffect, useRef, useState, useMemo } from "react";
 import { DraggableWindow } from "./DraggableWindow";
 
 interface TextEditWindowProps {
@@ -11,6 +11,7 @@ interface TextEditWindowProps {
   onHappenedScenarioChange?: (scenario: number) => void;
   initialPos?: { x: number; y: number };
   initialZIndex?: number;
+  children?: ReactNode;
 }
 
 export const TextEditWindow: React.FC<TextEditWindowProps> = ({
@@ -21,6 +22,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
   onHappenedModeChange,
   onHappenedHover,
   onHappenedScenarioChange,
+  children,
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [typingIdx, setTypingIdx] = useState(0);
@@ -405,6 +407,8 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
           )}
             </>
           )}
+        {/* Render custom children if provided */}
+        {children}
         </div>
       </div>
     </DraggableWindow>

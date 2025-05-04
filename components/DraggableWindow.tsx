@@ -26,9 +26,12 @@ export const DraggableWindow: React.FC<Props> = ({
     setZIndex(zIndexCounter);
   };
 
-  const mergedStyle = {
+  const mergedStyle: React.CSSProperties = {
     width,
     height,
+    display: "block",
+    boxSizing: "border-box",
+    overflow: "hidden",
     ...style,
     zIndex,
   };
@@ -42,7 +45,7 @@ export const DraggableWindow: React.FC<Props> = ({
       <div
         ref={nodeRef}
         id={id}
-        className={`draggable-window absolute rounded cursor-move ${className}`}
+        className={`draggable-window absolute rounded cursor-move overflow-hidden ${className}`}
         style={mergedStyle}
         onMouseDown={bringToFront}
       >
