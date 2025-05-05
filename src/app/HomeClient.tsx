@@ -13,6 +13,7 @@ import { educationContent } from "../../data/educationContent";
 import { entertainmentContent } from "../../data/entertainmentContent";
 import type { WindowConfig } from '../types/window';
 import { windows } from '../data/windows';
+import { MobileWarning } from "../../components/MobileWarning";
 
 
 // --- hyperlinks for special draggables ---
@@ -638,6 +639,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
 
   return (
     <>
+      <MobileWarning />
       <MacMenuBar
         onAddHealth={handleAddHealth}
         onAddEducation={handleAddEducation}
