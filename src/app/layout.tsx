@@ -29,6 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Tracking ID for external tools */}
+        <div className="06f6e090-b85b-422b-8c8f-e6df985326cd" style={{ display: "none" }} />
+
         {children}
         <SpeedInsights />
         <Analytics />
