@@ -4,10 +4,10 @@ import HomeClient from "./HomeClient";
 // Add metadata export at the top level of the file
 export const metadata = {
   title: "Horizon Shift Int 002",
-  description: "Explore NIS's Horizon Shift Volume 002 interactively. The report covers 3 key sectors: Eduation, Entertainment, and Health through strategic foresight frameworks.",
+  description: "Explore NIS's Horizon Shift Volume 002 interactively. The report covers 3 key sectors: Education, Entertainment, and Health through strategic foresight frameworks.",
   openGraph: {
     title: "Horizon Shift 002",
-    description: "Explore NIS's Horizon Shift Volume 002 interactively. The report covers 3 key sectors: Eduation, Entertainment, and Health through strategic foresight frameworks.",
+    description: "Explore NIS's Horizon Shift Volume 002 interactively. The report covers 3 key sectors: Education, Entertainment, and Health through strategic foresight frameworks.",
     url: "https://horizon-shift-git-main-khanikad-ucedus-projects.vercel.app/",
     siteName: "Horizon Shift 002",
     images: [
