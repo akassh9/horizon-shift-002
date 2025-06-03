@@ -136,14 +136,14 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
             >
               {item}
               {fileOpen && !disableFile && (
-                <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-60">
+                <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-[60]">
                   <div className="relative group">
                     <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer flex justify-between items-center">
                       Add
                       <span className="ml-2">&#9654;</span>
                     </div>
                     {/* Submenu */}
-                    <div className="absolute left-full top-0 mt-0 ml-1 w-36 bg-white border border-gray-200 rounded shadow-lg py-1 z-70">
+                    <div className="absolute left-full top-0 mt-0 ml-1 w-36 bg-white border border-gray-200 rounded shadow-lg py-1 z-[70]">
                       <div
                         className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
                         onClick={() => addSector("health", onAddHealth)}
@@ -193,7 +193,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
             >
               {item}
               {historyOpen && (
-                <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-60">
+                <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-[60]">
                   <Link
                     href="/history?volume=1"
                     target="_blank"
