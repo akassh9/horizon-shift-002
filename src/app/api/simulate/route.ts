@@ -1,7 +1,6 @@
 // src/app/api/simulate/route.ts
 import { groq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
-import { NextResponse } from 'next/server';
 
 export const runtime = 'edge'; // deploys as Edge Function
 
@@ -48,10 +47,10 @@ Output rules
 Begin.
 `;
 
-  const { textStream } = await streamText({
+  const result = await streamText({
     model: groq('llama-3.1-8b-instant'),
     prompt,
   });
 
-  return new NextResponse(textStream);
+  return result.toTextStreamResponse();
 }
