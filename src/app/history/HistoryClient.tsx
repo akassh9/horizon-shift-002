@@ -13,8 +13,8 @@ export default function HistoryClient() {
   const volume = searchParams.get("volume") || "1";
   const iframeSrc =
     volume === "2"
-      ? "https://issuu.com/uc_next_innovation_scholars/docs/horizon_shift_volume_002_future_creators_report?mode=window&viewMode=singlePage"
-      : "https://issuu.com/uc_next_innovation_scholars/docs/2023_uc_nis_future_creators_report_horizon_shift?mode=window&viewMode=singlePage";
+      ? "https://e.issuu.com/embed.html?d=horizon_shift_volume_002_future_creators_report&u=uc_next_innovation_scholars&hideIssuuLogo=true"
+      : "https://e.issuu.com/embed.html?d=2023_uc_nis_future_creators_report_horizon_shift&u=uc_next_innovation_scholars&hideIssuuLogo=true";
 
   return (
     <>
