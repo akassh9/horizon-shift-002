@@ -210,6 +210,14 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                   >
                     Volume 2
                   </Link>
+                  <Link
+                    href="/history?volume=3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Volume 3
+                  </Link>
                 </div>
               )}
             </span>

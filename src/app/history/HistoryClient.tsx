@@ -12,9 +12,11 @@ export default function HistoryClient() {
   }
   const volume = searchParams.get("volume") || "1";
   const iframeSrc =
-    volume === "2"
-      ? "https://e.issuu.com/embed.html?d=horizon_shift_volume_002_future_creators_report&u=uc_next_innovation_scholars&hideIssuuLogo=true"
-      : "https://e.issuu.com/embed.html?d=2023_uc_nis_future_creators_report_horizon_shift&u=uc_next_innovation_scholars&hideIssuuLogo=true";
+    volume === "3"
+      ? "https://e.issuu.com/embed.html?d=horizon_shift_volume_003_future_creators_report&u=uc_next_innovation_scholars&hideIssuuLogo=true"
+      : volume === "2"
+        ? "https://e.issuu.com/embed.html?d=horizon_shift_volume_002_future_creators_report&u=uc_next_innovation_scholars&hideIssuuLogo=true"
+        : "https://e.issuu.com/embed.html?d=2023_uc_nis_future_creators_report_horizon_shift&u=uc_next_innovation_scholars&hideIssuuLogo=true";
 
   return (
     <>
