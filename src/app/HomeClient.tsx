@@ -715,7 +715,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 </div>
                 {/* Title */}
                 <h1 className="ml-3 text-lg font-semibold">
-                  {noAnswerActive ? "Orientation Clip" : "Welcome User"}
+                  {noAnswerActive ? "Legal Clip" : "Welcome User"}
                 </h1>
                 {/* Timestamp */}
                 <span className="ml-auto text-sm text-gray-500">April 2, 2034</span>
@@ -725,13 +725,12 @@ To load a category, hover over the File menu, select Add, then choose your desir
                   {page2DisplayedText}
                 </div>
               ) : noAnswerActive ? (
-                <div className="px-4 py-3">
+                <div className="px-4 py-4">
                   <video
-                    className="w-full h-full rounded"
+                    className="w-full rounded"
                     src="/videos/no_clip.mp4"
                     controls
                     autoPlay
-                    muted
                     playsInline
                   />
                 </div>
