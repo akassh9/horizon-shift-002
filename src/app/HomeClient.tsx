@@ -266,8 +266,10 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-  // Determine if user has confirmed "yes"
-  const page2Active = helpAnswer.trim().toLowerCase() === "yes";
+  // Determine help answer state
+  const normalizedHelpAnswer = helpAnswer.trim().toLowerCase();
+  const page2Active = normalizedHelpAnswer === "yes";
+  const noAnswerActive = normalizedHelpAnswer === "no";
 
   // Preload draggable images when user passes the initial help screen
   useEffect(() => {
@@ -685,7 +687,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
           </motion.div>
         ) : showHelp ? (
           <motion.div
-            key={helpAnswer.trim().toLowerCase() === "yes" ? "help2" : "help1"}
+            key={page2Active ? "help2" : noAnswerActive ? "helpVideo" : "help1"}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -694,12 +696,12 @@ To load a category, hover over the File menu, select Add, then choose your desir
             <DraggableWindow
               id="help"
               initialPos={
-                helpAnswer.trim().toLowerCase() === "yes"
+                page2Active
                   ? { x: 760, y: 354.5 }
                   : { x: 694, y: 299 }
               }
-              width={helpAnswer.trim().toLowerCase() === "yes" ? 600 : 800}
-              height={helpAnswer.trim().toLowerCase() === "yes" ? 400 : 600}
+              width={page2Active ? 600 : noAnswerActive ? 720 : 800}
+              height={page2Active ? 400 : noAnswerActive ? 420 : 600}
               className="bg-white text-black shadow-md"
               initialZIndex={helpZIndex}
             >
@@ -712,13 +714,26 @@ To load a category, hover over the File menu, select Add, then choose your desir
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                 </div>
                 {/* Title */}
-                <h1 className="ml-3 text-lg font-semibold">Welcome User</h1>
+                <h1 className="ml-3 text-lg font-semibold">
+                  {noAnswerActive ? "Orientation Clip" : "Welcome User"}
+                </h1>
                 {/* Timestamp */}
                 <span className="ml-auto text-sm text-gray-500">April 2, 2034</span>
               </div>
-              {helpAnswer.trim().toLowerCase() === "yes" ? (
+              {page2Active ? (
                 <div className="px-4 py-3 font-mono whitespace-pre-wrap">
                   {page2DisplayedText}
+                </div>
+              ) : noAnswerActive ? (
+                <div className="px-4 py-3">
+                  <video
+                    className="w-full h-full rounded"
+                    src="/videos/no_clip.mp4"
+                    controls
+                    autoPlay
+                    muted
+                    playsInline
+                  />
                 </div>
               ) : (
                 <div className="px-4 py-3 font-mono whitespace-pre-wrap">
@@ -726,7 +741,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 </div>
               )}
               {/* input prompt for page1 only */}
-              {!(helpAnswer.trim().toLowerCase() === "yes") && helpTypingIdx >= helpIntroText.length && (
+              {!page2Active && !noAnswerActive && helpTypingIdx >= helpIntroText.length && (
                 <div className="mt-4 px-4 pb-3">
                   <div className="flex items-center font-mono">
                     <span className="mr-2">{">"}</span>
