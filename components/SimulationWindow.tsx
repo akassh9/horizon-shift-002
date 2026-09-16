@@ -21,7 +21,7 @@ export function SimulationWindow({
   loading = false,
 }: SimulationWindowProps) {
   // reference to terminal pane for auto‑scroll
-  const contentRef = useRef<HTMLPreElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // keep newest streamed text in view (only matters when showCursor = true)
   useEffect(() => {
@@ -45,14 +45,14 @@ export function SimulationWindow({
           <span className="ml-4 text-sm text-gray-300">{title}</span>
           <span className="ml-auto text-xs text-gray-400">{date}</span>
         </div>
-        <pre ref={contentRef} className="flex-1 overflow-auto p-4 whitespace-pre-wrap">
+        <div ref={contentRef} className="flex-1 min-h-0 overflow-auto p-4 whitespace-pre-wrap">
           {children}
           {loading ? (
             <span className="animate-spin inline-block ml-1">▌</span>
           ) : (
             showCursor && <span className="animate-blink ml-1">▌</span>
           )}
-        </pre>
+        </div>
       </div>
     </DraggableWindow>
   );

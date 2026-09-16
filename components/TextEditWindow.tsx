@@ -1,6 +1,6 @@
 "use client";
 import type { ForesightContent } from "../data/foresightContent";
-import React, { ReactNode, useEffect, useRef, useState, useMemo } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { DraggableWindow } from "./DraggableWindow";
 
 interface TextEditWindowProps {
@@ -29,6 +29,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
   const [revealedOptions, setRevealedOptions] = useState(0);
   const [showOptions, setShowOptions] = useState(false);
   const [selected, setSelected] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const [detailMode, setDetailMode] = useState(false);
   const [detailDisplayedText, setDetailDisplayedText] = useState("");
@@ -46,6 +47,11 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
 
   // Typing animation for happenedIntroText (now currentHappened.intro) when in happened mode
   useEffect(() => {
+    if (reduceMotion && happenedMode) {
+      setHappenedDisplayedText(currentHappened.intro);
+      setHappenedIdx(currentHappened.intro.length);
+      return;
+    }
     if (happenedMode && happenedIdx < currentHappened.intro.length) {
       const timeout = setTimeout(() => {
         setHappenedDisplayedText(currentHappened.intro.slice(0, happenedIdx + 1));
@@ -53,7 +59,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
       }, 18);
       return () => clearTimeout(timeout);
     }
-  }, [happenedMode, happenedIdx, currentHappened.intro]);
+  }, [happenedMode, happenedIdx, currentHappened.intro, reduceMotion]);
 
   useEffect(() => {
     if (happenedMode && happenedIdx >= currentHappened.intro.length) {
@@ -91,9 +97,60 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
     }
   }, [selected, showOptions, revealedOptions, onOptionSelect, content.options.length]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const detailOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const happenedOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const openDetail = useCallback((index = selected) => {
+    setSelected(index);
+    setDetailMode(true);
+    setHappenedMode(false);
+    setDetailDisplayedText("");
+    setDetailIdx(0);
+  }, [selected]);
+
+  const returnToOptions = useCallback(() => {
+    setDetailMode(false);
+    setHappenedMode(false);
+    onHappenedModeChange?.(false);
+    onHappenedHover?.(null);
+  }, [onHappenedHover, onHappenedModeChange]);
+
+  const openHappened = useCallback(() => {
+    setHappenedMode(true);
+    onHappenedScenarioChange?.(selected);
+    setHappenedScenario(selected);
+    setHappenedDisplayedText("");
+    setHappenedIdx(0);
+    setSelectedHappened(0);
+  }, [onHappenedScenarioChange, selected]);
+
+  const returnToStart = useCallback(() => {
+    returnToOptions();
+    setSelected(0);
+  }, [returnToOptions]);
+
+  const revealAll = useCallback(() => {
+    setDisplayedText(content.introText);
+    setTypingIdx(content.introText.length);
+    setShowOptions(true);
+    setRevealedOptions(content.options.length);
+  }, [content.introText, content.options.length]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReduceMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
 
   // Terminal typing animation for intro text
   useEffect(() => {
+    if (reduceMotion) {
+      revealAll();
+      return;
+    }
     if (typingIdx < content.introText.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(content.introText.slice(0, typingIdx + 1));
@@ -104,7 +161,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
       // Start revealing options after intro text is done
       setShowOptions(true);
     }
-  }, [typingIdx, content.introText]);
+  }, [typingIdx, content.introText, reduceMotion, revealAll]);
 
   // Animate options one by one
   useEffect(() => {
@@ -116,37 +173,33 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
     }
   }, [showOptions, revealedOptions, content.options.length]);
 
-  // Keyboard navigation for options (only when all options are revealed)
+  // Arrow navigation belongs to the terminal controls, not the whole page.
   useEffect(() => {
     if (!showOptions || revealedOptions < content.options.length) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      // If in detail mode, intercept keys
-      if (detailMode && detailIdx >= currentDetailText.length) {
+      const target = e.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (!target?.closest("#text-editor")) return;
+      if (!["ArrowUp", "ArrowDown", "Enter"].includes(e.key)) return;
+      const control = target?.closest("button");
+      if (control && !/^(option|detail-option|happened-option)-/.test(control.id)) return;
+
+      // If in detail mode, intercept keys once controls are available.
+      if (detailMode) {
         // DETAIL PAGE navigation (when happenedMode is false)
         if (!happenedMode) {
           if (e.key === "ArrowUp") {
+            e.preventDefault();
             setSelectedDetail(prev => prev === 0 ? detailOptions.length - 1 : prev - 1);
           } else if (e.key === "ArrowDown") {
+            e.preventDefault();
             setSelectedDetail(prev => prev === detailOptions.length - 1 ? 0 : prev + 1);
           } else if (e.key === "Enter") {
+            e.preventDefault();
             if (selectedDetail === 0) {
-              // go back
-              setDetailMode(false);
-              setHappenedMode(false);
-              if (onHappenedModeChange) {
-                onHappenedModeChange(false);
-              }
-              if (onHappenedHover) {
-                onHappenedHover(null);
-              }
+              returnToOptions();
             } else if (selectedDetail === 1) {
-              // enter happened page
-              setHappenedMode(true);
-              onHappenedScenarioChange?.(selected);
-              setHappenedScenario(selected);       // 0 = Dr Me, 1 = Profit, 2 = Enhancement
-              setHappenedDisplayedText("");
-              setHappenedIdx(0);
-              setSelectedHappened(0);
+              openHappened();
             }
           }
           return;
@@ -155,21 +208,20 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
         if (happenedMode) {
           const len = currentHappened.options.length;
           if (e.key === "ArrowUp") {
+            e.preventDefault();
             setSelectedHappened(prev =>
               prev === 0 ? len - 1 : prev - 1
             );
           } else if (e.key === "ArrowDown") {
+            e.preventDefault();
             setSelectedHappened(prev =>
               prev === len - 1 ? 0 : prev + 1
             );
           } else if (e.key === "Enter") {
+            e.preventDefault();
             // if "Return to Health Start" selected
             if (selectedHappened === len - 1) {
-              setDetailMode(false);
-              setHappenedMode(false);
-              if (onHappenedModeChange) onHappenedModeChange(false);
-              if (onHappenedHover) onHappenedHover(null);
-              setSelected(0);
+              returnToStart();
             }
           }
           return;
@@ -178,13 +230,14 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
 
       // Navigation for initial options
       if (e.key === "ArrowUp") {
+        e.preventDefault();
         setSelected((prev) => (prev === 0 ? content.options.length - 1 : prev - 1));
       } else if (e.key === "ArrowDown") {
+        e.preventDefault();
         setSelected((prev) => (prev === content.options.length - 1 ? 0 : prev + 1));
       } else if (e.key === "Enter") {
-        setDetailMode(true);
-        setDetailDisplayedText("");
-        setDetailIdx(0);
+        e.preventDefault();
+        openDetail();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -193,7 +246,6 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
     showOptions,
     revealedOptions,
     selected,
-    onOptionSelect,
     detailMode,
     detailIdx,
     currentDetailText,
@@ -201,11 +253,12 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
     detailOptions,
     selectedHappened,
     happenedMode,
-    onHappenedModeChange,
-    onHappenedHover,
-    onHappenedScenarioChange,
     currentHappened.options.length,
     content.options.length,
+    openDetail,
+    openHappened,
+    returnToOptions,
+    returnToStart,
   ]);
 
   // Auto-scroll to bottom only while typing the intro text
@@ -220,11 +273,17 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
     if (showOptions && revealedOptions === content.options.length) {
       const el = document.getElementById(`option-${selected}`);
       el?.scrollIntoView({ block: "nearest" });
+      optionRefs.current[selected]?.focus({ preventScroll: true });
     }
   }, [selected, showOptions, revealedOptions, content.options.length]);
 
   // Typing animation for detailText when in detail mode
   useEffect(() => {
+    if (reduceMotion && detailMode) {
+      setDetailDisplayedText(currentDetailText);
+      setDetailIdx(currentDetailText.length);
+      return;
+    }
     if (detailMode && detailIdx < currentDetailText.length) {
       const timeout = setTimeout(() => {
         setDetailDisplayedText(currentDetailText.slice(0, detailIdx + 1));
@@ -232,7 +291,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
       }, 18);
       return () => clearTimeout(timeout);
     }
-  }, [detailMode, detailIdx, currentDetailText]);
+  }, [detailMode, detailIdx, currentDetailText, reduceMotion]);
 
   // Auto-scroll container while detail text is streaming
   useEffect(() => {
@@ -251,6 +310,9 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
         const el = document.getElementById(`detail-option-${selectedDetail}`);
         el?.scrollIntoView({ block: "nearest" });
       }
+      (happenedMode ? happenedOptionRefs : detailOptionRefs).current[
+        happenedMode ? selectedHappened : selectedDetail
+      ]?.focus({ preventScroll: true });
     }
   }, [selectedDetail, selectedHappened, detailMode, happenedMode, detailIdx, currentDetailText.length]);
 
@@ -288,13 +350,28 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
                 className="whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: displayedText }}
               />
+              {typingIdx < content.introText.length && (
+                <button
+                  id="text-reveal-all"
+                  type="button"
+                  className="mt-3 rounded border border-gray-300 px-3 py-1 font-mono text-sm text-gray-600 hover:bg-gray-100"
+                  onClick={revealAll}
+                >
+                  Reveal all
+                </button>
+              )}
               {showOptions && (
                 <div className="mt-4">
                   {content.options.map((opt, idx) => (
-                    <div
+                    <button
+                      ref={(element) => { optionRefs.current[idx] = element; }}
                       id={`option-${idx}`}
                       key={opt.file}
-                      className={`mb-3 cursor-pointer ${selected === idx ? "bg-blue-50" : ""}`}
+                      type="button"
+                      aria-pressed={selected === idx}
+                      onFocus={() => setSelected(idx)}
+                      onClick={() => openDetail(idx)}
+                      className={`mb-3 block w-full text-left cursor-pointer ${selected === idx ? "bg-blue-50" : ""}`}
                     >
                       <div
                         className={`flex items-center px-2 py-1 ${
@@ -309,7 +386,7 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
                           <div className="font-mono text-sm mt-1">{opt.description}</div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -325,40 +402,30 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
                 className="whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: detailDisplayedText }}
               />
-              {detailIdx >= currentDetailText.length && (
-                <div className="mt-4">
+              <div className="mt-4" aria-label="Detail options">
                   {detailOptions.map((opt, idx) => (
-                    <div
+                    <button
+                      ref={(element) => { detailOptionRefs.current[idx] = element; }}
                       id={`detail-option-${idx}`}
                       key={opt}
-                      className={`mb-2 cursor-pointer pl-2 ${
+                      type="button"
+                      onFocus={() => setSelectedDetail(idx)}
+                      className={`mb-2 block w-full cursor-pointer pl-2 text-left ${
                         selectedDetail === idx ? "bg-blue-50 text-blue-700" : "text-gray-900"
                       }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         if (idx === 0) {
-                          // go back
-                          setDetailMode(false);
-                          setHappenedMode(false);
-                          onHappenedModeChange?.(false);
-                          onHappenedHover?.(null);
+                          returnToOptions();
                         } else if (idx === 1) {
-                          // enter happened page
-                          setHappenedMode(true);
-                          onHappenedScenarioChange?.(selected);
-                          setHappenedScenario(selected);
-                          setHappenedDisplayedText("");
-                          setHappenedIdx(0);
-                          setSelectedHappened(0);
+                          openHappened();
                         }
                       }}
                     >
                       <span className="mr-2">{">"}</span>
                       <span className="font-mono">{opt}</span>
-                    </div>
+                    </button>
                   ))}
-                </div>
-              )}
+              </div>
             </>
           )}
 
@@ -372,13 +439,18 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
                 className="whitespace-pre-wrap mb-4"
                 dangerouslySetInnerHTML={{ __html: happenedDisplayedText.replace(/\n/g, "<br/>") }}
               />
-          {happenedIdx >= currentHappened.intro.length && (
-            <div className="mt-4">
+            <div className="mt-4" aria-label="How this happened options">
               {currentHappened.options.map((opt, idx) => (
-                <div
+                <button
+                  ref={(element) => { happenedOptionRefs.current[idx] = element; }}
                   id={`happened-option-${idx}`}
                   key={opt}
-                  className={`mb-2 cursor-pointer pl-2 ${
+                  type="button"
+                  onFocus={() => {
+                    setSelectedHappened(idx);
+                    onHappenedHover?.(idx);
+                  }}
+                  className={`mb-2 block w-full cursor-pointer pl-2 text-left ${
                     selectedHappened === idx ? "bg-blue-50 text-blue-700" : "text-gray-900"
                   }`}
                   onMouseEnter={() => {
@@ -387,24 +459,17 @@ export const TextEditWindow: React.FC<TextEditWindowProps> = ({
                       onHappenedHover(idx);
                     }
                   }}
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() => {
                     if (idx === currentHappened.options.length - 1) {
-                      // return to start
-                      setDetailMode(false);
-                      setHappenedMode(false);
-                      onHappenedModeChange?.(false);
-                      onHappenedHover?.(null);
-                      setSelected(0);
+                      returnToStart();
                     }
                   }}
                 >
                   <span className="mr-2">{">"}</span>
                   <span className="font-mono">{opt}</span>
-                </div>
+                </button>
               ))}
             </div>
-          )}
             </>
           )}
         {/* Render custom children if provided */}

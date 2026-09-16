@@ -1,246 +1,117 @@
 "use client";
-import "../globals.css";
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { SimulationWindow } from "../../../components/SimulationWindow";
 import { MacMenuBar } from "../../../components/MacMenuBar";
+import { readSimulation } from "@/lib/simulation-stream";
 
-const PROMPTS: Record<
-  Exclude<"intro" | "job" | "age" | "marital" | "city" | "result", "result">,
-  string
-> = {
-  intro: [
-    "Welcome back to the world of 2034!",
-    "You’ve just stepped out of Extended Aging Freeze™ and this simulation will help you re-acclimate.",
-    "Let’s build your personalised “day in the life” profile."
-  ].join("\n\n"),
-
-  job: [
-    "First, what role will you assume in this new society?",
-    "(Either type your actual 2028 job title—or pick one of our upskilling-certified careers:)",
-    "• Immersive Experience Architect",
-    "• Personal Data Broker",
-    "• Holistic Curriculum Curator",
-    "• Augmented-Reality Venue Medic",
-    "• Ethical AI Talent Agent"
-  ].join("\n"),
-
-  age: "Next, how old are you now? (Please enter your current age in years)",
-
-  marital: [
-    "What’s your relationship status as you restart life in 2034?",
-    "(Select one: Single, Married, Divorced)"
-  ].join(" "),
-
-  city: [
-    "Finally, which city are you waking up in?",
-    "This will help ground your simulation in the right locale."
-  ].join(" ")
+type Profile = { job: string; age: string; marital: string; city: string };
+const fields = ['job', 'age', 'marital', 'city'] as const;
+const prompts = {
+  job: 'What role will you assume in 2034?',
+  age: 'How old are you in this future? Enter an age from 1 to 120.',
+  marital: 'What is your relationship status as you restart life in 2034?',
+  city: 'Which city are you waking up in?',
 };
-
-
-// ----------------------------------
-// Helper to fetch scenario text
-// ----------------------------------
-async function* fetchScenario(profile: {
-  job: string;
-  age: string;
-  marital: string;
-  city: string;
-}) {
-  const res = await fetch("/api/simulate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(profile),
-  });
-
-  const reader = res.body!.getReader();
-  const decoder = new TextDecoder();
-  let full = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    full += decoder.decode(value);
-    yield full;
-  }
-}
+const examples = ['Immersive Experience Architect', 'Personal Data Broker', 'Holistic Curriculum Curator'];
+const buttonClass = 'rounded border border-gray-500 px-3 py-1.5 text-sm hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
 export default function SimulatePage() {
   const router = useRouter();
+  const [step, setStep] = useState(-1);
+  const [profile, setProfile] = useState<Profile>({ job: '', age: '', marital: 'Single', city: '' });
+  const [text, setText] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [complete, setComplete] = useState(false);
+  const controllerRef = useRef<AbortController | null>(null);
+  const activeField = fields[step];
 
-  // wizard steps
-  const [step, setStep] = useState<
-    "intro" | "job" | "age" | "marital" | "city" | "result"
-  >("intro");
+  useEffect(() => () => controllerRef.current?.abort(), []);
 
-  // collected answers
-  const [job, setJob] = useState("");
-  const [age, setAge] = useState("");
-  const [marital, setMarital] = useState("");
-  const [city, setCity] = useState("");
-
-  // track the intro input text
-  const [introInput, setIntroInput] = useState("");
-
-  // displayed text for the TextEditWindow
-  const [displayedText, setDisplayedText] = useState("");
-
-  // typewriter for prompt steps (robust to StrictMode double‑mount)
-  useEffect(() => {
-    if (step === "result") return;
-
-    const promptText = PROMPTS[step as keyof typeof PROMPTS];
-    let cancelled = false;
-
-    (async () => {
-      setDisplayedText("");
-      for (let i = 0; i < promptText.length; i++) {
-        if (cancelled) return;
-        setDisplayedText((prev) => prev + promptText[i]);
-        await new Promise((r) => setTimeout(r, 15));
+  const generate = async () => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 40_000);
+    setStep(4);
+    setText('');
+    setError('');
+    setComplete(false);
+    setLoading(true);
+    try {
+      const response = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+        signal: controller.signal,
+      });
+      for await (const chunk of readSimulation(response)) {
+        if (controller.signal.aborted) return;
+        setText(previous => previous + chunk);
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [step]);
-
-  // handlers for moving to next step
-  const handleNext = useCallback(() => {
-    if (step === "intro") setStep("job");
-    else if (step === "job" && job.trim()) setStep("age");
-    else if (step === "age" && /^\d{2}$/.test(age)) setStep("marital");
-    else if (step === "marital" && marital.trim()) setStep("city");
-    else if (step === "city" && city.trim()) setStep("result");
-  }, [step, job, age, marital, city]);
-
-
-  // when all inputs are collected, stream the scenario character by character (slicing-based, avoids duplication)
-  useEffect(() => {
-    if (step === "result") {
-      (async () => {
-        try {
-          setDisplayedText(""); // reset before streaming
-          let received = ""; // track what we've already displayed
-          for await (const chunk of fetchScenario({ job, age, marital, city })) {
-            // isolate only the newly received text
-            const newPortion = chunk.slice(received.length);
-            received = chunk;
-            for (const char of newPortion) {
-              setDisplayedText((prev) => prev + char);
-              // small delay for terminal effect
-              await new Promise((res) => setTimeout(res, 10));
-            }
-          }
-        } catch {
-          setDisplayedText("Error streaming simulation. Please try again.");
-        }
-      })();
+      if (!controller.signal.aborted) setComplete(true);
+    } catch (cause) {
+      if (controllerRef.current !== controller) return;
+      setError(timedOut ? 'This is taking too long. Please try again.' : controller.signal.aborted ? 'Simulation canceled. You can retry or edit your profile.' : cause instanceof Error ? cause.message : 'Simulation failed. Please try again.');
+    } finally {
+      clearTimeout(timer);
+      if (controllerRef.current === controller) setLoading(false);
     }
-  }, [step, job, age, marital, city]);
-
-  type QuestionStep = "job" | "age" | "marital" | "city";
-
-  // render the input field or start button based on step
-  const renderInput = () => {
-    // hide options until typewriter finishes
-    if (step !== "result") {
-      const fullPrompt = PROMPTS[step as keyof typeof PROMPTS];
-      if (displayedText.length < fullPrompt.length) return null;
-    }
-
-    if (step === "intro") {
-      return (
-        <div className="mt-4 font-mono text-[#fefefe] flex items-center">
-          {/* terminal-style input prompt */}
-          <span className="mr-2">{">"}</span>
-          <input
-            autoFocus
-            type="text"
-            value={introInput}
-            onChange={(e) => setIntroInput(e.target.value)}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (
-                e.key === "Enter" &&
-                introInput.trim().toLowerCase() === "yes"
-              ) {
-                handleNext();
-              }
-            }}
-            placeholder="Type 'yes' and press return to begin"
-            className="bg-transparent flex-1 focus:outline-none border-none font-mono placeholder-gray-500"
-          />
-        </div>
-      );
-    }
-
-    if (step !== "result") {
-      const valueMap: Record<QuestionStep, string> = { job, age, marital, city };
-      const setterMap: Record<QuestionStep, (v: string) => void> = {
-        job: setJob,
-        age: (v: string) => {
-          if (/^\d{0,2}$/.test(v)) setAge(v);
-        },
-        marital: setMarital,
-        city: setCity,
-      };
-
-      return (
-        <div className="mt-4 font-mono text-[#fefefe] flex items-center">
-          {/* macOS terminal–style prompt */}
-          <span className="mr-2">{"\u003E"}</span>
-          <input
-            autoFocus
-            type="text"
-            value={valueMap[step as QuestionStep]}
-            onChange={(e) => setterMap[step as QuestionStep](e.target.value)}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter") handleNext();
-            }}
-            className="bg-transparent flex-1 focus:outline-none border-none font-mono placeholder-gray-500"
-            placeholder=""
-          />
-        </div>
-      );
-    }
-
-    return null;
   };
 
-  return (
-    <>
-      <Suspense fallback={null}>
-        <MacMenuBar
-          onAddHealth={() => router.push("/?sector=health")}
-          onAddEducation={() => router.push("/?sector=education")}
-          onAddEntertainment={() => router.push("/?sector=entertainment")}
-          disableFile={false}
-          disableSimulate={true}
-          onHelp={() => router.push("/?help=yes")}
-          disableHelp={false}
-        />
-      </Suspense>
+  const editProfile = () => {
+    controllerRef.current?.abort();
+    controllerRef.current = null;
+    setLoading(false);
+    setError('');
+    setStep(0);
+  };
 
-      <div className="flex flex-col items-center justify-center min-h-screen space-y-6">
-        <SimulationWindow
-          key={step}
-          title="Simulation Mode"
-          date="April 2, 2034"
-          showCursor={step === "result"}
-          size={{
-            intro: { width: 720, height: 500 },
-            job: { width: 720, height: 500 },
-            age: { width: 720, height: 500 },
-            marital: { width: 720, height: 500 },
-            city: { width: 720, height: 500 },
-            result: { width: 720, height: 500 },
-          }[step]}
-        >
-          {displayedText}
-          {renderInput()}
-        </SimulationWindow>
-      </div>
-    </>
-  );
+  return <>
+    <Suspense fallback={null}>
+      <MacMenuBar
+        onAddHealth={() => router.push('/?sector=health')}
+        onAddEducation={() => router.push('/?sector=education')}
+        onAddEntertainment={() => router.push('/?sector=entertainment')}
+        disableSimulate onHelp={() => router.push('/?help=yes')}
+      />
+    </Suspense>
+    <main className="flex min-h-screen items-center justify-center px-4 pt-12">
+      <SimulationWindow title="Simulation Mode" date="April 2, 2034" showCursor={loading} size={{ width: 720, height: 540 }}>
+        {step === -1 ? <>
+          <p>Welcome back to the world of 2034!</p>
+          <p className="mt-4">You’ve just stepped out of Extended Aging Freeze™. Build a profile to explore a possible day in your future.</p>
+          <p className="mt-4 text-sm text-gray-400">Use an imagined profile. Your answers are sent to our AI provider to generate this fictional scenario.</p>
+          <button className={`${buttonClass} mt-6`} onClick={() => setStep(0)}>Begin simulation →</button>
+        </> : step < 4 ? <form onSubmit={event => {
+          event.preventDefault();
+          if (step === 3) void generate(); else setStep(step + 1);
+        }}>
+          <p className="mb-4 text-sm text-gray-400">Profile · {step + 1} of 4</p>
+          <label htmlFor="profile-answer" className="block mb-4">{prompts[activeField]}</label>
+          {activeField === 'marital' ? <select id="profile-answer" autoFocus value={profile.marital} onChange={event => setProfile({ ...profile, marital: event.target.value })} className="w-full rounded border border-gray-500 bg-black p-2 focus-visible:outline-2 focus-visible:outline-white">
+            {['Single', 'Married', 'Divorced', 'Partnered', 'Prefer not to say'].map(value => <option key={value}>{value}</option>)}
+          </select> : <input key={activeField} id="profile-answer" autoFocus required type={activeField === 'age' ? 'number' : 'text'} min={activeField === 'age' ? 1 : undefined} max={activeField === 'age' ? 120 : undefined} step={activeField === 'age' ? 1 : undefined} minLength={activeField === 'age' ? undefined : 2} maxLength={100} value={profile[activeField]} onChange={event => setProfile({ ...profile, [activeField]: event.target.value })} className="w-full rounded border border-gray-500 bg-black p-2 focus-visible:outline-2 focus-visible:outline-white" />}
+          {activeField === 'job' && <div className="mt-4 flex flex-wrap gap-2">{examples.map(example => <button key={example} type="button" className={buttonClass} onClick={() => setProfile({ ...profile, job: example })}>{example}</button>)}</div>}
+          <div className="mt-6 flex gap-3">
+            <button type="button" className={buttonClass} onClick={() => setStep(step - 1)}>← Back</button>
+            <button type="submit" className={buttonClass}>{step === 3 ? 'Generate my day →' : 'Continue →'}</button>
+          </div>
+        </form> : <>
+          <p className="mb-4 text-xs text-gray-400">Fictional 2034 scenario · {profile.job} · {profile.city}</p>
+          {loading && !text && <p role="status">Connecting to your future…</p>}
+          <div className="whitespace-pre-wrap">{text}</div>
+          {error && <p role="alert" className="mt-4 text-red-300">{error}</p>}
+          {complete && <p role="status" className="mt-4 text-sm text-gray-400">Simulation complete.</p>}
+          <div className="mt-6 flex flex-wrap gap-3">
+            {loading ? <button className={buttonClass} onClick={() => controllerRef.current?.abort()}>Cancel</button> : <button className={buttonClass} onClick={() => void generate()}>{error ? 'Retry' : 'Generate another day'}</button>}
+            <button className={buttonClass} onClick={editProfile}>Edit profile</button>
+          </div>
+        </>}
+      </SimulationWindow>
+    </main>
+  </>;
 }

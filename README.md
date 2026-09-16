@@ -5,7 +5,7 @@
 
 > Build an **interactive foresight terminal** simulating a 2040‑era “archive computer.”
 > Users explore speculative scenarios (Health / Education / Entertainment) inside draggable macOS‑style windows, toggle timelines (“How did this happen?”), and skim headline clippings dropped around the screen.
-> **Everything**—text animation, z‑index juggling, menu‑bar gating, headline reveal—is client‑side React; the server only ships static assets.
+> **Everything**—text animation, z‑index juggling, menu‑bar gating, headline reveal—is client‑side React; the simulation API streams a fictional day from Groq.
 
 ---
 
@@ -169,23 +169,21 @@ All timings are hard‑coded constants; feel free to expose as props if needed.
 
 ---
 
-# 10 · Runbook
+# 10 · Runbook
+
+Use Node.js 22.6 or newer (the stream tests use native TypeScript stripping).
 
 ```bash
-# Install
-brew install yarn           # if yarn missing
-yarn                         # or: corepack enable && pnpm i
-
-# Develop
-yarn dev                     # http://localhost:3000
-
-# Lint / type‑check
-next lint && tsc --noEmit
-
-# Build / preview
-yarn build && yarn start
+npm ci
+npm run dev
+npm run lint
+npm test
+npm run build
+npm start
 ```
 
-Vercel deploy works out of the box (no environment vars).
+For simulation, set `GROQ_API_KEY` in `.env.local` locally and in the Vercel production environment. Never commit credentials. `GROQ_MODEL` optionally overrides the default `openai/gpt-oss-20b` model served by Groq; no OpenAI API key is required.
 
----
+`POST /api/simulate` accepts `job`, `age`, `marital`, and `city`. It validates input and streams newline-delimited JSON with `text`, `done`, and `error` events. Clients must receive nonempty text and a `done` event before reporting success. Provider failures, empty output, interrupted streams, and timeouts show a retryable error.
+
+Pushes to the linked production branch deploy through Vercel. After deployment, test a fictional profile through `/simulate` and confirm a completed result, rather than only an HTTP 200.

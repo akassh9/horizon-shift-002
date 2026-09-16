@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { DraggableWindow } from '../../components/DraggableWindow';
 import { TextEditWindow } from '../../components/TextEditWindow';
 import { MacMenuBar } from '../../components/MacMenuBar';
 import Image from 'next/image';
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { healthContent } from "../../data/healthContent";
 import { educationContent } from "../../data/educationContent";
 import { entertainmentContent } from "../../data/entertainmentContent";
@@ -134,11 +134,21 @@ function MotionWindow({
   cfg,
   bringToFront,
   highlighted = false,
+  priority = false,
 }: {
   cfg: WindowConfig;
   bringToFront: (id: string) => void;
   highlighted?: boolean;
+  priority?: boolean;
 }) {
+  const [decodedSource, setDecodedSource] = useState<string>();
+  const prefersReducedMotion = useReducedMotion();
+  const imageDecoded = decodedSource === cfg.src;
+
+  const markImageDecoded = (image: HTMLImageElement) => {
+    void image.decode().catch(() => undefined).then(() => setDecodedSource(cfg.src));
+  };
+
   return (
     <motion.div
       key={cfg.key}
@@ -147,10 +157,10 @@ function MotionWindow({
         if (cfg.key !== "king4") bringToFront(cfg.key);
       }}
       style={{ }}
-      initial={{ opacity: 0, y: 40 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 40 }}
-      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      exit={prefersReducedMotion ? undefined : { opacity: 0, y: 40 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] }}
     >
       <DraggableWindow
         id={cfg.key}
@@ -171,7 +181,12 @@ function MotionWindow({
             alt={cfg.key}
             width={cfg.size.width as number}
             height={cfg.size.height as number}
-            className="object-contain pointer-events-none select-none"
+            sizes={`${cfg.size.width}px`}
+            priority={priority}
+            onLoad={(event) => markImageDecoded(event.currentTarget)}
+            className={`object-contain pointer-events-none select-none ${prefersReducedMotion ? "" : "transition-opacity duration-150"} ${
+              imageDecoded ? "opacity-100" : "opacity-0"
+            }`}
           />
         ) : (
           <div className="p-2">
@@ -214,99 +229,50 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<"health" | "education" | "entertainment" | null>(null);
 
   const router = useRouter();
-
   const searchParams = useSearchParams();
+  const prefersReducedMotion = useReducedMotion();
+
+  const selectCategory = useCallback((category: "health" | "education" | "entertainment", updateUrl = true) => {
+    setShowHelp(false);
+    setSelectedCategory(category);
+    setSelectedOption(0);
+    setHappenedMode(false);
+    setHoveredHappened(null);
+    if (updateUrl) router.push(`/?sector=${category}`, { scroll: false });
+  }, [router]);
+
+  const openHelp = useCallback((updateUrl = true) => {
+    setShowHelp(true);
+    setHelpAnswer("yes");
+    setSelectedCategory(null);
+    setSelectedOption(-1);
+    setHappenedMode(false);
+    setHoveredHappened(null);
+    if (updateUrl) router.push("/?help=yes", { scroll: false });
+  }, [router]);
 
   useEffect(() => {
-    if (!searchParams) {
-      return;
-    }
     const sector = searchParams.get("sector");
     const helpParam = searchParams.get("help");
 
     if (helpParam === "yes") {
-      handleHelpClick();
-    } else if (sector === "health") {
-      handleAddHealth();
-    } else if (sector === "education") {
-      handleAddEducation();
-    } else if (sector === "entertainment") {
-      handleAddEntertainment();
+      openHelp(false);
+    } else if (sector === "health" || sector === "education" || sector === "entertainment") {
+      selectCategory(sector, false);
+    } else {
+      setShowHelp(true);
+      setHelpAnswer("");
+      setSelectedCategory(null);
+      setSelectedOption(-1);
+      setHappenedMode(false);
+      setHoveredHappened(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openHelp, searchParams, selectCategory]);
 
-  useEffect(() => {
-    // Prefetch JS modules
-    import('../../data/healthContent');
-    import('../../data/educationContent');
-    import('../../data/entertainmentContent');
-
-    // Flatten keys for each category
-    const allHealthWindowKeys = Object.values(optionWindows).flat();
-    const allEducationOptionKeys = Object.values(educationOptionWindows).flat();
-    const allEntertainmentOptionKeys = Object.values(entertainmentOptionWindows).flat();
-
-    const nonHappenedKeys = {
-      health: allHealthWindowKeys,
-      education: allEducationOptionKeys,
-      entertainment: allEntertainmentOptionKeys,
-    } as const;
-
-    // Preload images for each category
-    (['health','education','entertainment'] as const).forEach(cat => {
-      const keys = nonHappenedKeys[cat];
-      windows
-        .filter(w => w.type === 'image' && keys.includes(w.key))
-        .forEach(w => {
-          const img = new window.Image();
-          img.src = w.src!;
-        });
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
   // Determine help answer state
   const normalizedHelpAnswer = helpAnswer.trim().toLowerCase();
   const page2Active = normalizedHelpAnswer === "yes";
   const noAnswerActive = normalizedHelpAnswer === "no";
-
-  // Preload draggable images when user passes the initial help screen
-  useEffect(() => {
-    if (page2Active) {
-      const allDraggableKeys = [
-        ...allHealthWindowKeys,
-        ...allEducationOptionKeys,
-        ...allEntertainmentOptionKeys,
-      ];
-      windows
-        .filter(w => w.type === 'image' && allDraggableKeys.includes(w.key))
-        .forEach(w => {
-          const img = new window.Image();
-          img.src = w.src!;
-        });
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page2Active]);
-  
-  // Preload images for the current "happened" section once the user enters happened mode
-  useEffect(() => {
-    if (happenedMode && selectedCategory) {
-      let keysToPreload: string[] = [];
-      if (selectedCategory === "health") {
-        keysToPreload = Object.values(scenarioDraggables[happenedScenario] || {}).flat();
-      } else if (selectedCategory === "education") {
-        keysToPreload = Object.values(educationScenarioDraggables[happenedScenario] || {}).flat();
-      } else if (selectedCategory === "entertainment") {
-        keysToPreload = Object.values(entertainmentScenarioDraggables[happenedScenario] || {}).flat();
-      }
-      windows
-        .filter(w => w.type === "image" && keysToPreload.includes(w.key))
-        .forEach(w => {
-          const img = new window.Image();
-          img.src = w.src!;
-        });
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [happenedMode, selectedCategory, happenedScenario]);
 
   // Help intro typing effect
   const helpIntroText = `This resource has been developed by SIN Consulting Ltd. to help you adjust to everyday life in the year 2034.
@@ -330,7 +296,7 @@ You can now explore the following content categories to familiarize yourself wit
 • Education
 • Entertainment
 
-To load a category, hover over the File menu, select Add, then choose your desired category.`;
+To load a category, use the buttons below or hover over the File menu, select Add, then choose your desired category.`;
   const [page2DisplayedText, setPage2DisplayedText] = useState("");
   const [page2TypingIdx, setPage2TypingIdx] = useState(0);
 
@@ -339,24 +305,36 @@ To load a category, hover over the File menu, select Add, then choose your desir
   // --- loadedIntroText/loadedDisplayedText removed, no longer needed for help flow ---
 
   useEffect(() => {
-    if (showHelp && helpTypingIdx < helpIntroText.length) {
+    if (!showHelp) return;
+    if (prefersReducedMotion) {
+      setHelpDisplayedText(helpIntroText);
+      setHelpTypingIdx(helpIntroText.length);
+      return;
+    }
+    if (helpTypingIdx < helpIntroText.length) {
       const timeout = setTimeout(() => {
         setHelpDisplayedText(helpIntroText.slice(0, helpTypingIdx + 1));
         setHelpTypingIdx(helpTypingIdx + 1);
       }, 15);
       return () => clearTimeout(timeout);
     }
-  }, [helpTypingIdx, showHelp, helpIntroText]);
+  }, [helpTypingIdx, showHelp, helpIntroText, prefersReducedMotion]);
 
   useEffect(() => {
-    if (page2Active && page2TypingIdx < page2IntroText.length) {
+    if (!page2Active) return;
+    if (prefersReducedMotion) {
+      setPage2DisplayedText(page2IntroText);
+      setPage2TypingIdx(page2IntroText.length);
+      return;
+    }
+    if (page2TypingIdx < page2IntroText.length) {
       const timeout = setTimeout(() => {
         setPage2DisplayedText(page2IntroText.slice(0, page2TypingIdx + 1));
         setPage2TypingIdx(page2TypingIdx + 1);
       }, 15);
       return () => clearTimeout(timeout);
     }
-  }, [page2TypingIdx, page2Active, page2IntroText]);
+  }, [page2TypingIdx, page2Active, page2IntroText, prefersReducedMotion]);
 
   // Easter egg: when the user types “nis” (any casing), open the Next Innovation Scholars page
   useEffect(() => {
@@ -370,25 +348,13 @@ To load a category, hover over the File menu, select Add, then choose your desir
 
   // Handler to be called from MacMenuBar
   const handleAddHealth = () => {
-    setShowHelp(false);
-    setSelectedCategory("health");
-    setSelectedOption(-1);
-    setHappenedMode(false);
-    setHoveredHappened(null);
+    selectCategory("health");
   };
   const handleAddEducation = () => {
-    setShowHelp(false);
-    setSelectedCategory("education");
-    setSelectedOption(-1);
-    setHappenedMode(false);
-    setHoveredHappened(null);
+    selectCategory("education");
   };
   const handleAddEntertainment = () => {
-    setShowHelp(false);
-    setSelectedCategory("entertainment");
-    setSelectedOption(-1);
-    setHappenedMode(false);
-    setHoveredHappened(null);
+    selectCategory("entertainment");
   };
 
   // Bring-to-front logic for windows (placeholder for real logic)
@@ -628,17 +594,6 @@ To load a category, hover over the File menu, select Add, then choose your desir
         }
       })();
 
-  // Handler to open help page 2 directly
-  const handleHelpClick = () => {
-    setShowHelp(true);
-    setHelpAnswer("yes");
-    setSelectedCategory(null);
-    setSelectedOption(-1);
-    setHappenedMode(false);
-    setHoveredHappened(null);
-    router.push("/?help=yes");
-  };
-
   return (
     <>
       <MobileWarning />
@@ -646,18 +601,18 @@ To load a category, hover over the File menu, select Add, then choose your desir
         onAddHealth={handleAddHealth}
         onAddEducation={handleAddEducation}
         onAddEntertainment={handleAddEntertainment}
-        disableFile={!page2Active}
-        onHelp={handleHelpClick}
+        disableFile={showHelp && !page2Active}
+        onHelp={() => openHelp()}
         disableHelp={showHelp}
       />
       <AnimatePresence mode="wait" initial={false}>
         {loadedHelp ? (
           <motion.div
             key="helpLoaded"
-            initial={{ opacity: 0, y: 20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: -20 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
           >
             <DraggableWindow
               id="help"
@@ -677,21 +632,37 @@ To load a category, hover over the File menu, select Add, then choose your desir
                 <h1 className="ml-3 text-lg font-semibold">Help Guide – Page 2</h1>
                 <span className="ml-auto text-sm text-gray-500">April 2, 2034</span>
               </div>
-              <div className="px-4 py-3 mb-4 font-mono text-sm text-gray-800 bg-blue-50 border-l-4 border-blue-400 rounded-md italic shadow-sm">
-                Calibrate: Press <kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>+</kbd>/<kbd>-</kbd> to zoom in and out until this window is centered on your screen.
-              </div>
-              <div className="px-4 py-3 font-mono whitespace-pre-wrap">
-                {page2DisplayedText}
+              <div className="max-h-[calc(400px-2.5rem)] overflow-y-auto">
+                <div className="px-4 py-3 font-mono whitespace-pre-wrap">
+                  {page2DisplayedText}
+                </div>
+                <div className="flex flex-wrap gap-2 px-4 pb-4">
+                  <button type="button" className="rounded border border-gray-400 px-3 py-1 font-mono text-sm hover:bg-gray-100" onClick={handleAddHealth}>Open Health</button>
+                  <button type="button" className="rounded border border-gray-400 px-3 py-1 font-mono text-sm hover:bg-gray-100" onClick={handleAddEducation}>Open Education</button>
+                  <button type="button" className="rounded border border-gray-400 px-3 py-1 font-mono text-sm hover:bg-gray-100" onClick={handleAddEntertainment}>Open Entertainment</button>
+                  {page2TypingIdx < page2IntroText.length && (
+                    <button
+                      type="button"
+                      className="rounded border border-gray-300 px-3 py-1 font-mono text-sm text-gray-600 hover:bg-gray-100"
+                      onClick={() => {
+                        setPage2DisplayedText(page2IntroText);
+                        setPage2TypingIdx(page2IntroText.length);
+                      }}
+                    >
+                      Reveal guide
+                    </button>
+                  )}
+                </div>
               </div>
             </DraggableWindow>
           </motion.div>
         ) : showHelp ? (
           <motion.div
             key={page2Active ? "help2" : noAnswerActive ? "helpVideo" : "help1"}
-            initial={{ opacity: 0, y: 20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: -20 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
           >
             <DraggableWindow
               id="help"
@@ -735,9 +706,25 @@ To load a category, hover over the File menu, select Add, then choose your desir
                   />
                 </div>
               ) : (
-                <div className="px-4 py-3 font-mono whitespace-pre-wrap">
-                  {helpDisplayedText}
-                </div>
+                <>
+                  <div className="px-4 py-3 font-mono whitespace-pre-wrap">
+                    {helpDisplayedText}
+                  </div>
+                  {helpTypingIdx < helpIntroText.length && (
+                    <div className="px-4 pb-3">
+                      <button
+                        type="button"
+                        className="rounded border border-gray-300 px-3 py-1 font-mono text-sm text-gray-600 hover:bg-gray-100"
+                        onClick={() => {
+                          setHelpDisplayedText(helpIntroText);
+                          setHelpTypingIdx(helpIntroText.length);
+                        }}
+                      >
+                        Skip intro
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
               {/* input prompt for page1 only */}
               {!page2Active && !noAnswerActive && helpTypingIdx >= helpIntroText.length && (
@@ -764,10 +751,10 @@ To load a category, hover over the File menu, select Add, then choose your desir
         {selectedCategory && (
           <motion.div
             key={`text-editor-${selectedCategory}`}
-            initial={{ opacity: 0, y: 40 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: 40 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] }}
           >
             <TextEditWindow
               content={
@@ -795,6 +782,7 @@ To load a category, hover over the File menu, select Add, then choose your desir
             cfg={cfg}
             bringToFront={bringToFront}
             highlighted={highlightedKeys.includes(cfg.key)}
+            priority={!happenedMode && selectedOption === 0}
           />
         ))}
       </AnimatePresence>

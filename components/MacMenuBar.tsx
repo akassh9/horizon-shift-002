@@ -25,9 +25,9 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
   disableSimulate,
 }) => {
   const [fileOpen, setFileOpen] = useState(false);
-  const fileRef = useRef<HTMLSpanElement>(null);
+  const fileRef = useRef<HTMLDivElement>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const historyRef = useRef<HTMLSpanElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
 
   const pathname = usePathname() ?? "";
   const isHistoryPage = pathname.startsWith("/history");
@@ -57,13 +57,14 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
     sector: "health" | "education" | "entertainment",
     cb?: () => void
   ) => {
-    navigate({ sector, help: undefined });
-    cb?.();
+    setFileOpen(false);
+    if (cb) cb();
+    else navigate({ sector, help: undefined });
   };
 
   const triggerHelp = () => {
-    navigate({ help: "yes", sector: undefined });
-    onHelp?.();
+    if (onHelp) onHelp();
+    else navigate({ help: "yes", sector: undefined });
   };
 
   // Close dropdown when clicking outside
@@ -97,6 +98,17 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [historyOpen]);
 
+  React.useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setFileOpen(false);
+        setHistoryOpen(false);
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
   return (
     <div
       className="
@@ -110,71 +122,82 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
       "
       style={{ fontSize: "1rem", minHeight: "40px" }} // 16px font, 40px height
     >
-      <span className="mr-6 text-lg"></span>
-      <nav className="flex space-x-6 text-base font-medium relative">
+      <span className="mr-2 sm:mr-6 text-lg"></span>
+      <nav className="flex gap-1 sm:gap-6 text-sm sm:text-base font-medium relative">
         {["Terminal 13.2", "File", "Simulate", "History", "Help"].map((item) => {
           const disabled = disableAll 
             || (isHistoryPage && item !== "Terminal 13.2" && item !== "History");
 
           if (disabled) {
             return (
-              <span
+              <button
                 key={item}
+                type="button"
+                disabled
                 className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
               >
                 {item}
-              </span>
+              </button>
             );
           }
 
           return item === "File" ? (
-            <span
+            <div
               key={item}
               ref={fileRef}
-              className={`px-2 py-1 rounded relative ${fileOpen ? "bg-gray-200" : ""} ${disableFile ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 cursor-pointer"}`}
-              onClick={() => { if (!disableFile) setFileOpen(open => !open); }}
+              className="relative"
             >
-              {item}
+              <button
+                type="button"
+                aria-expanded={fileOpen}
+                disabled={disableFile}
+                className={`px-2 py-1 rounded ${fileOpen ? "bg-gray-200" : ""} ${disableFile ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 cursor-pointer"}`}
+                onClick={() => setFileOpen(open => !open)}
+              >
+                {item}
+              </button>
               {fileOpen && !disableFile && (
                 <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-[60]">
                   <div className="relative group">
-                    <div className="px-4 py-1 hover:bg-gray-100 cursor-pointer flex justify-between items-center">
+                    <button type="button" className="w-full px-4 py-1 hover:bg-gray-100 cursor-pointer flex justify-between items-center">
                       Add
                       <span className="ml-2">&#9654;</span>
-                    </div>
+                    </button>
                     {/* Submenu */}
                     <div className="absolute left-full top-0 mt-0 ml-1 w-36 bg-white border border-gray-200 rounded shadow-lg py-1 z-[70]">
-                      <div
-                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                      <button type="button"
+                        className="block w-full px-4 py-1 text-left hover:bg-gray-100 cursor-pointer"
                         onClick={() => addSector("health", onAddHealth)}
                       >
                         Health
-                      </div>
-                      <div
-                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                      </button>
+                      <button type="button"
+                        className="block w-full px-4 py-1 text-left hover:bg-gray-100 cursor-pointer"
                         onClick={() => addSector("education", onAddEducation)}
                       >
                         Education
-                      </div>
-                      <div
-                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                      </button>
+                      <button type="button"
+                        className="block w-full px-4 py-1 text-left hover:bg-gray-100 cursor-pointer"
                         onClick={() => addSector("entertainment", onAddEntertainment)}
                       >
                         Entertainment
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>
               )}
-            </span>
+            </div>
           ) : item === "Simulate" ? (
             disableSimulate ? (
-              <span
+              <button
                 key="Simulate"
+                type="button"
+                disabled
                 className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
               >
                 Simulate
-              </span>
+              </button>
             ) : (
               <Link
                 key="Simulate"
@@ -185,13 +208,17 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
               </Link>
             )
           ) : item === "History" ? (
-            <span
+            <div
               key={item}
               ref={historyRef}
-              className={`px-2 py-1 rounded relative ${historyOpen ? "bg-gray-200" : ""} hover:bg-gray-200 cursor-pointer`}
-              onClick={() => setHistoryOpen(open => !open)}
+              className="relative"
             >
-              {item}
+              <button
+                type="button"
+                aria-expanded={historyOpen}
+                className={`px-2 py-1 rounded ${historyOpen ? "bg-gray-200" : ""} hover:bg-gray-200 cursor-pointer`}
+                onClick={() => setHistoryOpen(open => !open)}
+              >{item}</button>
               {historyOpen && (
                 <div className="absolute left-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-[60]">
                   <Link
@@ -199,6 +226,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setHistoryOpen(false)}
                   >
                     Volume 1
                   </Link>
@@ -207,6 +235,7 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setHistoryOpen(false)}
                   >
                     Volume 2
                   </Link>
@@ -215,33 +244,37 @@ export const MacMenuBar: React.FC<MacMenuBarProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block px-4 py-1 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setHistoryOpen(false)}
                   >
                     Volume 3
                   </Link>
                 </div>
               )}
-            </span>
+            </div>
           ) : item === "Help" ? (
             disableHelp ? (
-              <span
+              <button
                 key="Help"
+                type="button"
+                disabled
                 className="px-2 py-1 rounded opacity-50 cursor-not-allowed"
               >
                 Help
-              </span>
+              </button>
             ) : (
-              <span
+              <button
                 key="Help"
+                type="button"
                 className="px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
                 onClick={triggerHelp}
               >
                 Help
-              </span>
+              </button>
             )
           ) : (
-            <span key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
+            <button type="button" key={item} className="hover:bg-gray-200 px-2 py-1 rounded cursor-pointer">
               {item}
-            </span>
+            </button>
           );
         })}
       </nav>
